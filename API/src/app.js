@@ -1,7 +1,7 @@
 const app = require('express')();
 const consign = require('consign');
 
-consign({ cwd: 'src', verbose: false})
+consign({ cwd: 'src', verbose: false })
   .include('./config/middlewares.js')
   .then('./routes')
   .then('./config/routes.js')

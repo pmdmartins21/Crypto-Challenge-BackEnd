@@ -3,3 +3,4 @@ module.exports = (app) => {
     .get(app.routes.users.findAll)
     .post(app.routes.users.create);
 };
+
