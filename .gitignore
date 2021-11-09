@@ -2,6 +2,9 @@
 logs
 *.log
 
+#Configuração com a base de dados através do KNEX (configurar de acordo com a maquina local)
+Knexfile.js
+
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
