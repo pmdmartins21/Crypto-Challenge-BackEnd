@@ -7,7 +7,7 @@ module.exports = {
       password: 'ROOT',
       database: 'cryptochallenge',
     },
-    debug: true,
+    debug: false,
     migrations: {
       directory: 'src/migrations',
     },
