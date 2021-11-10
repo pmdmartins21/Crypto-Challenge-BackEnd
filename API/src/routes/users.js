@@ -4,5 +4,10 @@ module.exports = (app) => {
       .then((result) => res.status(200).json(result));
   };
 
-  return { findAll };
+  const create = async (req, res) => {
+    const result = await app.services.user.save(req.body);
+    return res.status(201).json(result[0]);
+  };
+
+  return { findAll, create };
 };
