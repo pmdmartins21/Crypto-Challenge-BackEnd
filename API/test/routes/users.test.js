@@ -8,7 +8,7 @@ test('Test #1 - Listar os utilizadores', () => {
   return request(app).get('/users')
     .then((res) => {
       expect(res.status).toBe(200);
-      expect(res.body).toHaveLength(4);
+      expect(res.body).not.toHaveLength(0);
       expect(res.body[0]).toHaveProperty('firstName');
     });
 });
