@@ -18,8 +18,8 @@ module.exports = (app) => {
     const userDb = await findOne({ username: user.username });
     if (userDb) throw new ValidationError('Email duplicado na Bd');
 
-    return app.db('users').insert(user, ['id', 'firstName', 'lastName', 'username', 'password']);
+    return app.db('users').insert(user, ['id', 'firstName', 'lastName', 'username' ]);
   };
 
-  return { findAll, save };
+  return { findAll, save, findOne };
 };
