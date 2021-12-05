@@ -1,7 +1,7 @@
 const passport = require('passport');
 const passportJwt = require('passport-jwt');
 
-const secret = 'ipca!DWM@202122';
+const secret = 'CdTp!DWM@202122';
 
 const { Strategy, ExtractJwt } = passportJwt;
 

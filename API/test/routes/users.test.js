@@ -4,11 +4,17 @@ const jwt = require('jwt-simple');
 const app = require('../../src/app');
 
 const username = `${Date.now()}`;
-const secret = 'ipca!DWM@202122';
+const secret = 'CdTp!DWM@202122';
 const MAIN_ROUTE = '/v1/users';
 
 let user;
-
+let userAdmin = {
+  firstName: 'Pedro',
+  lastName: 'Martins',
+  username: 'admin',
+  password: 'admin',
+  email: 'admin@cryptochallenge.com'
+};
 
 beforeAll(async () => {
   const res = await app.services.user.save({ firstName: 'Pedro', lastName: 'Martins', username: username, password: '12345' });
@@ -29,15 +35,102 @@ test('Test #1 - Listar os utilizadores', () => {
 test('Test #2 - Inserir utilizadores', () => {
   return request(app).post(MAIN_ROUTE)
   .set('authorization', `bearer ${user.token}`)
-    .send({
-      firstName: 'João',
-      lastName: 'Manuel',
-      username: `${Date.now()}`,
-      password: '12345',
-    })
+    .send({ firstName: 'João', lastName: 'Manuel', username: `${Date.now()}`, 
+            email: `${Date.now()}@gmail.com`, password: '12345' })
     .then((res) => {
       expect(res.status).toBe(201);
       expect(res.body.firstName).toBe('João');
       expect(res.body).not.toHaveProperty('password');
+    });
+});
+
+
+test('Test #2.1 - Guardar a palavra passe encriptada', async () => {
+  const res = await request(app).post(MAIN_ROUTE)
+    .set('authorization', `bearer ${user.token}`)
+    .send({ firstName: 'João', lastName: 'Manuel', username: `${Date.now()}`, 
+            email: `${Date.now()}@gmail.com`, password: '12345' })
+  expect(res.status).toBe(201);
+
+  const { id } = res.body;
+  const userDB = await app.services.user.findOne({ id });
+  expect(userDB.password).not.toBeUndefined();
+  expect(userDB.password).not.toBe('12345');
+});
+
+//por os testes abaixo dentro deste describe
+describe('Validação de criar um user', () => {
+  const testTemplate = (newData, errorMessage) => {
+    return request(app).post(MAIN_ROUTE)
+      .set('authorization', `bearer ${user.token}`)
+      .send({
+        firstName: 'João', lastName: 'Manuel', username: `${Date.now()}`, 
+            email: `${Date.now()}@gmail.com`, password: '12345', ...newData,
+      })
+      .then((res) => {
+        expect(res.status).toBe(400);
+        expect(res.body.error).toBe(errorMessage);
+      });
+  };
+
+  test('Test 9.1 - Sem First Name', () => testTemplate({ firstName: null }, 'O First Name é um atributo obrigatório'));
+  test('Test 9.2 - Sem Last Name', () => testTemplate({ lastName: null }, 'O Last Name é um atributo obrigatório'));
+  test('Test 9.3 - Sem Email', () => testTemplate({ email: null }, 'O EMAIL é um atributo obrigatório'));
+  test('Test 9.4 - Sem Username', () => testTemplate({ username: null }, 'O USERNAME é um atributo obrigatório'));
+  test('Test 9.4 - Sem Password', () => testTemplate({ password: null }, 'A Password é um atributo obrigatório'));
+});
+
+
+test('Test #3 - Alterar info de utilizador por Id', async () => {
+  return app.db(MAIN_ROUTE)
+    .insert({ firstName: 'OldName', lastName: 'Manuel', username: `${Date.now()}`, 
+    email: `${Date.now()}@gmail.com`, password: '12345'}, ['id'])
+    .then((acc) => request(app).put(`${MAIN_ROUTE}/${acc[0].id}`)
+      .set('authorization', `bearer ${user.token}`)
+      .send({ firstName: 'NewName' }))
+    .then((res) => {
+      expect(res.status).toBe(200);
+      expect(res.body.firstName).toBe('NewName');
+    });
+});
+
+test('Test #3 - Alterar info de utilizador por Id', async () => { //restrito ao proprio utilizador
+  return app.db('users')
+    .insert({ firstName: 'OldName', lastName: 'Manuel', username: `${Date.now()}`, 
+    email: `${Date.now()}@gmail.com`, password: '12345'}, ['id'])
+    .then((acc) => request(app).put(`${MAIN_ROUTE}/${acc[0].id}`)
+      .set('authorization', `bearer ${user.token}`)
+      .send({ firstName: 'NewName' }))
+    .then((res) => {
+      expect(res.status).toBe(200);
+      expect(res.body.firstName).toBe('NewName');
+    });
+});
+
+test('Test #19 - Inserir username Duplicado', () => {
+  return app.db('users')
+    .insert({ firstName: 'Zé', lastName: 'Manuel', username: 'UserDuplicated', 
+    email: `${Date.now()}@gmail.com`, password: '12345'})
+    .then(() => request(app).post(MAIN_ROUTE)
+      .set('authorization', `bearer ${user.token}`)
+      .send({firstName: 'Zé', lastName: 'Manuel', username: 'UserDuplicated', 
+      email: `${Date.now()}@gmail.com`, password: '12345'}))
+    .then((res) => {
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('Já existe uma conta com o username indicado');
+    });
+});
+
+test('Test #19 - Inserir email Duplicado', () => {
+  return app.db('users')
+    .insert({ firstName: 'Zé', lastName: 'Manuel', username: `${Date.now()}@gmail.com`, 
+    email: `emailDuplicated@gmail.com`, password: '12345'})
+    .then(() => request(app).post(MAIN_ROUTE)
+      .set('authorization', `bearer ${user.token}`)
+      .send({ firstName: 'Zé', lastName: 'Manuel', username: `${Date.now()}@gmail.com`, 
+      email: `emailDuplicated@gmail.com`, password: '12345'}))
+    .then((res) => {
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('Já existe uma conta com o email indicado');
     });
 });

@@ -3,7 +3,7 @@ const jwt = require('jwt-simple');
 const bcrypt = require('bcrypt-nodejs');
 const ValidationError = require('../errors/validationError');
 
-const secret = 'ipca!DWM@202122';
+const secret = 'CdTp!DWM@202122';
 
 module.exports = (app) => {
   const router = express.Router();
