@@ -4,7 +4,7 @@ const jwt = require('jwt-simple');
 const app = require('../../src/app');
 
 const name = `${Date.now()}`;
-const secret = 'ipca!DWM@202122';
+const secret = 'CdTp!DWM@202122';
 const MAIN_ROUTE = '/v1/cryptos';
 
 let user;
@@ -47,3 +47,8 @@ test('Test #5 - Inserir nome de Crypto duplicado', () => {
       expect(res.body.error).toBe('Name duplicado na Bd');
     });
 });
+
+test('Test #6 - Remover Crypto', () => {});
+test('Test #6 - Alterar Crypto', () => {});
+
+test('Test #6 - Obter Crypto que não existe', () => {});
