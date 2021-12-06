@@ -127,49 +127,6 @@ test('Teste #17 -Transaçoes de venda devem ser negativas', () => {
     });
 });
 
-//teste vai para gameusers
-test('Teste #17 - Tentar uma transaçao de compra sem saldo suficiente', async () => {
-  const res = await app.services.gameUsers.save({ user_id: userC.id, game_id: testGameA.id, cash: 0});
-  testGameAUserC = { ...res3[0] };
-
-  return request(app).post(MAIN_ROUTE)
-  .set('authorization', `bearer ${userC.token}`)
-  .send({
-    games_users_id: testGameAUserC.id, crypto_id: testCrypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100 
-  })
-  .then((res) => {
-    expect(res.status).toBe(401);
-    expect(res.body.error).toBe('Não tem saldo suficiente para a transação');
-  });
-});
-
-//teste vai para gamewallet
-test('Teste #17 - Tentar um transaçao de venda sem possuir a cripto em carteira, ou em quantidade suficiente',  () => {
-  // return app.db('gameWallet').insert(
-  //   { games_users_id: testGameAUserA, crypto_id: testCrypto.id, amount: 1 }, ['id'],
-  // ).then((gamewallet) => request(app).put(`${MAIN_ROUTE}/${gamewallet[0].id}`)
-  //   .set('authorization', `bearer ${userA.token}`)
-  //   .send({ amount: -5 })
-  //   .then((res) => {
-  //     expect(res.status).toBe(200);
-  //     expect(res.body.desc).toBe('Trans Updated');
-  //   }));
-  
-  // const res = await app.services.gameWallet.save({ games_users_id: testGameAUserA, crypto_id: testCrypto.id, amount: 1});
-  // testGameAUserC = { ...res3[0] };
-
-  // return request(app).put(MAIN_ROUTE)
-  // .set('authorization', `bearer ${userC.token}`)
-  // .send({
-  //   games_users_id: testGameAUserA, crypto_id: testCrypto.id, amount: 1 
-  // })
-  // .then((res) => {
-  //   expect(res.status).toBe(401);
-  //   expect(res.body.error).toBe('Não tem saldo suficiente para a transação');
-  // });
-});
-
-
 //validar todos os campos
 describe('Validação de criar uma transação', () => {
   const testTemplate = (newData, errorMessage) => {
