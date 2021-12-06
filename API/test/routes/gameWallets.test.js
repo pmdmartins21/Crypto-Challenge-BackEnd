@@ -4,29 +4,56 @@ const jwt = require('jwt-simple');
 const app = require('../../src/app');
 
 const username = `${Date.now()}`;
+const email = `${Date.now()}@ipca.pt`;
+const startDate = Date.now();
 const secret = 'CdTp!DWM@202122';
-const MAIN_ROUTE = '/v1/wallets';
+const MAIN_ROUTE = '/v1/gameWallet';
+const crypto = `${Date.now()}`
 
+let testGame;
 let user;
+let testCrypto;
+let testGameUser;
+let testGameWallet;
 //só o proprio user pode ver items da carteira com o seu id
 
 beforeAll(async () => {
-  const res = await app.services.user.save({ firstName: 'Pedro', lastName: 'Martins', username: username, password: '12345' });
+  const res = await app.services.user.save({ firstName: 'Pedro', lastName: 'Martins', username: username, email:email, password: '12345' });
   user = { ...res[0] };
   user.token = jwt.encode(user, secret);
-  
+  const res2 = await app.services.game.save({ startDate:startDate, endDate: Date.now() });
+  testGame = { ...res2[0] };
+  const res3 = await app.services.gameUsers.save({ user_id: user.id, game_id: testGame.id});
+  testGameUser = { ...res3[0] };
+  const res4 = await app.services.crypto.save({ name: crypto });
+  testCrypto = { ...res4[0] };
+  const res5 = await app.services.gameWallet.save({ games_users_id: testGameUser.id, crypto_id: testCrypto.id, amount:5 });
+  testGameWallet = { ...res5[0] };
 });
 
-test('Test #5 - Obter as coins de um utilizador', (user) => {
-  return request(app).get(MAIN_ROUTE)
+test('Test #5 - Obter a gameWallet de um utilizador', () => {
+  return request(app).get(`${MAIN_ROUTE}/${testGame.id}/${user.id}`)
     .set('authorization', `bearer ${user.token}`)
     .then((res) => {
       expect(res.status).toBe(200);
       expect(res.body).not.toHaveLength(0);
-      expect(res.body[0]).toHaveProperty('firstName');
+      expect(res.body[0]).toHaveProperty('crypto_id');
+      expect(res.body[0].amount).tobe(5);
+      expect(res.body[0].games_users_id).tobe(testGameUser.id);
     });
 });
 
-test('Test #5 - Obter as coins de outros utilizadores', (user) => {});
+test('Test #5 - Obter as coins de outros utilizadores', () => {
+  return app.db('/v1/users')
+    .insert({ firstName: 'Account', lastName: 'Invalid', email: `${Date.now()}@ipca.pt`, username: `${Date.now()}`, password: '12345'}, ['id'])
+    .then((newUser) => request(app).get(`${MAIN_ROUTE}/${testGame.id}/${newUser.id}`)
+      .set('authorization', `bearer ${user.token}`))
+    .then((res) => {
+      expect(res.status).toBe(403);
+      expect(res.body.error).toBe('Não tem acesso ao recurso solicitado');
+    });
+});
 
+test('Test #5 - Efetuar uma compra de crypto', () => {});
 
+test('Test #5 - Efetuar uma venda de crypto', () => {});

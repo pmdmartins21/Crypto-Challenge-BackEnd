@@ -36,7 +36,31 @@ test('Teste #13 - Criar um novo jogo', () => {
       expect(res.body.startDate).toBe(startDate);
     });
 });
-test('Teste #13 - Listar um jogo especifico', () => {
-  
+test('Teste #13 - Listar um jogo por id', () => {
+  return app.db('games')
+    .insert({ startDate: startDate, endDate: Date.now()}, ['id'])
+    .then((game) => request(app).get(`${MAIN_ROUTE}/${game[0].id}`)
+      .set('authorization', `bearer ${user.token}`))
+    .then((res) => {
+      expect(res.status).toBe(200);
+      expect(res.body.startDate).toBe(startDate);
+      expect(res.body).toHaveLength(1);
+    });
 });
-test('Teste #13 - definir o inicio-fim do jogo', () => {});
+
+test('Teste #13 - definir o inicio-fim do jogo', () => {
+  const newStartDate = Date.now();
+  const newEndDate = Date.now();
+
+  return app.db('games')
+    .insert({ startDate: startDate, endDate: Date.now()}, ['id'])
+    .then((game) => request(app).put(`${MAIN_ROUTE}/${game[0].id}`)
+      .set('authorization', `bearer ${user.token}`)
+      .send({ startDate: newStartDate, endDate: newEndDate }))
+    .then((res) => {
+      expect(res.status).toBe(200);
+      expect(res.body.startDate).toBe(newStartDate);
+      expect(res.body.endDate).toBe(newEndDate);
+      expect(res.body).toHaveLength(1);
+    });
+});
