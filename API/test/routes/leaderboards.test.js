@@ -19,10 +19,10 @@ beforeAll(async () => {
 
 test('Teste #13 - Obter o leaderboard de um determinado jogo', () => {
   return app.db('games_users').insert(
-    {users_id: user.id, game_id: testGame.id, cash: 20000 }, ['id'],
+    {users_id: user.id, game_id: testGame.id, cashBalance: 20000 }, ['id'],
     )
     .then((game_user) => app.db('leaderboards').insert(
-      {game_user_id: game_user.id , finalCashBalance: game_user.cash }
+      {game_user_id: game_user.id , finalCashBalance: game_user.cashBalance }
     )
     .then(() => request(app).get(`${MAIN_ROUTE}/${testGame.id}`)
     .set('authorization', `bearer ${user.token}`)
