@@ -3,7 +3,7 @@ const ValidationError = require('../errors/validationError');
 
 module.exports = (app) => {
   const findAll = (filter = {}) => {
-    return app.db('users').where(filter).select('*');
+    return app.db('users').where(filter).select(['id', 'firstName', 'lastName','email', 'username' ]);
   };
 
   const findOne = (filter = {}) => {
@@ -26,7 +26,7 @@ module.exports = (app) => {
     if (userDb) throw new ValidationError('Já existe uma conta com o username indicado');
 
     const userDb2 = await findOne({ email: user.email });
-    if (userDb2) throw new ValidationError('Email duplicado na Bd');
+    if (userDb2) throw new ValidationError('Já existe uma conta com o email indicado');
 
     const newUser = { ...user };
     newUser.password = getPasswdHash(user.password);

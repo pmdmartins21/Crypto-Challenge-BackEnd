@@ -21,6 +21,9 @@ beforeAll(async () => {
   const res = await app.services.user.save({ firstName: 'Pedro', lastName: 'Martins', username: username, password: '12345', email: email });
   user = { ...res[0] };
   user.token = jwt.encode(user, secret);
+  const res2 = await app.services.user.save({ firstName: 'User', lastName: 'ToDelete', username: `${Date.now()}`, password: '12345', email: `${Date.now()}@gmail.com` });
+  userToDelete = { ...res[0] };
+  userToDelete.token = jwt.encode(userToDelete, secret);
 });
 
 test('Test #1 - Listar os utilizadores', () => {
@@ -98,43 +101,40 @@ test('Test #2.3 - Inserir username Duplicado', () => {
     });
 });
 
-// test('Test #2.4 - Inserir email Duplicado', () => {
-//   return app.db('users')
-//     .insert({ firstName: 'Zé', lastName: 'Manuel', username: `${Date.now()}@gmail.com`, 
-//     email: email, password: '12345'})
-//     .then(() => request(app).post(MAIN_ROUTE)
-//       .set('authorization', `bearer ${user.token}`)
-//       .send({ firstName: 'Zé', lastName: 'Manuel', username: `${Date.now()}@gmail.com`, 
-//       email: email, password: '12345'}))
-//     .then((res) => {
-//       expect(res.status).toBe(400);
-//       expect(res.body.error).toBe('Já existe uma conta com o email indicado');
-//     });
-// });
+test('Test #2.4 - Inserir email Duplicado', () => {
+  const emailParaDuplicar = `${Date.now()}@ipca.pt`;
+  
+  return app.db('users')
+    .insert({ firstName: 'Zé', lastName: 'Manuel', username: `${Date.now()}`, 
+    email: emailParaDuplicar, password: '12345'})
+    .then(() => request(app).post(MAIN_ROUTE)
+      .set('authorization', `bearer ${user.token}`)
+      .send({ firstName: 'Zé', lastName: 'Manuel', username: `${Date.now()}`, 
+      email: emailParaDuplicar, password: '12345'}))
+    .then((res) => {
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('Já existe uma conta com o email indicado');
+    });
+});
 
 
-// test('Teste #3 - Listar um user por id', () => {
-//   return app.db('users')
-//     .insert({ firstName: 'João', lastName: 'Manuel', username: `${Date.now()}`, 
-//     email: `${Date.now()}@gmail.com`, password: '12345' }, ['id'])
-//     .then((user) => request(app).get(`${MAIN_ROUTE}/${user[0].id}`)
-//       .set('authorization', `bearer ${user.token}`))
-//     .then((res) => {
-//       expect(res.status).toBe(200);
-//       expect(res.body[0].firstName).toBe('João');
-//       expect(res.body[0]).not.toHaveProperty('password');
-//     });
-// });
-// test('Test #4 - Eliminar User', () => {
-//   return app.db('user')
-//     .insert({ firstName: 'Zé', lastName: 'Manuel', username: `${Date.now()}@gmail.com`, 
-//     email: `${Date.now()}@gmail.com`, password: '12345'}, ['id'])
-//     .then((user) => request(app).delete(`${MAIN_ROUTE}/${user[0].id}`)
-//       .set('authorization', `bearer ${user.token}`))
-//     .then((res) => {
-//       expect(res.status).toBe(204);
-//     });
-// });
+test('Teste #3 - Listar um user por id', () => {
+  return request(app).get(`${MAIN_ROUTE}/${user.id}`)
+    .set('authorization', `bearer ${user.token}`)
+    .then((res) => {
+      expect(res.status).toBe(200);
+      expect(res.body.firstName).toBe(user.firstName);
+      expect(res.body).not.toBe(user.password);
+    });
+});
+
+test('Test #4 - Eliminar User', () => {
+  return  request(app).delete(`${MAIN_ROUTE}/${userToDelete.id}`)
+      .set('authorization', `bearer ${userToDelete.token}`)
+    .then((res) => {
+      expect(res.status).toBe(204);
+    });
+});
 
 // //por os testes abaixo dentro deste describe
 
