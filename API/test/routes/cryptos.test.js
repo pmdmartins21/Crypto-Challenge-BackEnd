@@ -5,6 +5,7 @@ const app = require('../../src/app');
 
 const secret = 'CdTp!DWM@202122';
 const MAIN_ROUTE = '/v1/cryptos';
+const crypto = Date.now();
 
 let user;
 let userAdmin = {
@@ -23,7 +24,7 @@ beforeAll(async () => {
 });
 
 
-test('Test #3 - Listar todas as cryptos', () => {
+test('Test #6 - Listar todas as cryptos', () => {
   return request(app).get(MAIN_ROUTE)
     .set('authorization', `bearer ${user.token}`)
     .then((res) => {
@@ -33,7 +34,7 @@ test('Test #3 - Listar todas as cryptos', () => {
     });
 });
 
-test('Test #4 - Inserir crypto', () => {
+test('Test #7 - Inserir crypto', () => {
   return request(app).post(MAIN_ROUTE)
     .set('authorization', `bearer ${user.token}`)
     .send({
@@ -45,7 +46,7 @@ test('Test #4 - Inserir crypto', () => {
     });
 });
 
-test('Test #5 - Inserir nome de Crypto duplicado', () => {
+test('Test #7.1 - Inserir nome de Crypto duplicado', () => {
   return app.db('cryptos')
     .insert({ name: 'Crypto Dup' })
     .then(() => request(app).post(MAIN_ROUTE)
@@ -57,17 +58,7 @@ test('Test #5 - Inserir nome de Crypto duplicado', () => {
     });
 });
 
-test('Test #6 - Remover Crypto', () => {
-  return app.db('cryptos')
-    .insert({ name: 'Crypto to Remove' }, ['id'])
-    .then((crypto) => request(app).delete(`${MAIN_ROUTE}/${crypto[0].id}`)
-      .set('authorization', `bearer ${user.token}`)
-      .send({ name: 'Crypto Removed' }))
-    .then((res) => {
-      expect(res.status).toBe(204);
-    });
-});
-test('Test #6 - Alterar Crypto por ID', () => {
+test('Test #8 - Alterar Crypto por ID', () => {
   return app.db('cryptos')
     .insert({ name: 'Crypto - Update'}, ['id'])
     .then((crypto) => request(app).put(`${MAIN_ROUTE}/${crypto[0].id}`)
@@ -79,4 +70,26 @@ test('Test #6 - Alterar Crypto por ID', () => {
     });
 });
 
+test('Test #9 - Remover Crypto', () => {
+  return app.db('cryptos')
+    .insert({ name: 'Crypto to Remove' }, ['id'])
+    .then((crypto) => request(app).delete(`${MAIN_ROUTE}/${crypto[0].id}`)
+      .set('authorization', `bearer ${user.token}`)
+      .send({ name: 'Crypto Removed' }))
+    .then((res) => {
+      expect(res.status).toBe(204);
+    });
+});
+
+test('Teste #10 - Listar uma Crypto por id', () => {
+  return app.db('cryptos')
+    .insert({ name: crypto}, ['id'])
+    .then((crypto) => request(app).get(`${MAIN_ROUTE}/${crypto[0].id}`)
+      .set('authorization', `bearer ${user.token}`))
+    .then((res) => {
+      expect(res.status).toBe(200);
+      expect(res.body[0].name).toBe(crypto);
+      expect(res.body).toHaveLength(1);
+    });
+});
 //alterar crypto sem ser admin

@@ -36,7 +36,7 @@ test('Teste #13 - Criar um novo jogo', () => {
       expect(res.body.startDate).toBe(startDate);
     });
 });
-test('Teste #13 - Listar um jogo por id', () => {
+test('Teste #14 - Listar um jogo por id', () => {
   return app.db('games')
     .insert({ startDate: startDate, endDate: Date.now()}, ['id'])
     .then((game) => request(app).get(`${MAIN_ROUTE}/${game[0].id}`)
@@ -48,7 +48,7 @@ test('Teste #13 - Listar um jogo por id', () => {
     });
 });
 
-test('Teste #13 - definir o inicio-fim do jogo', () => {
+test('Teste #15 - definir o inicio-fim do jogo', () => {
   const newStartDate = Date.now();
   const newEndDate = Date.now();
 

@@ -31,7 +31,7 @@ beforeAll(async () => {
   testGameWallet = { ...res5[0] };
 });
 
-test('Test #5 - Obter a gameWallet de um utilizador', () => {
+test('Test #17.1 - Obter a gameWallet de um utilizador', () => {
   return request(app).get(`${MAIN_ROUTE}/${testGame.id}/${user.id}`)
     .set('authorization', `bearer ${user.token}`)
     .then((res) => {
@@ -43,7 +43,7 @@ test('Test #5 - Obter a gameWallet de um utilizador', () => {
     });
 });
 
-test('Test #5 - Obter as coins de outros utilizadores', () => {
+test('Test #17.2 - Obter as coins de outros utilizadores', () => {
   return app.db('/v1/users')
     .insert({ firstName: 'Account', lastName: 'Invalid', email: `${Date.now()}@ipca.pt`, username: `${Date.now()}`, password: '12345'}, ['id'])
     .then((newUser) => request(app).get(`${MAIN_ROUTE}/${testGame.id}/${newUser.id}`)
@@ -54,7 +54,7 @@ test('Test #5 - Obter as coins de outros utilizadores', () => {
     });
 });
 
-test('Teste #17 - Tentar um transaçao de venda sem possuir a cripto em carteira, ou em quantidade suficiente',  () => {
+test('Teste #17.3 - Tentar um transaçao de venda sem possuir a cripto em carteira, ou em quantidade suficiente',  () => {
   return app.db('gameWallet').insert(
     { games_users_id: testGameAUserA, crypto_id: testCrypto.id, amount: 1 }, ['id'],
   ).then((gamewallet) => request(app).put(`${MAIN_ROUTE}/${gamewallet[0].id}`)
