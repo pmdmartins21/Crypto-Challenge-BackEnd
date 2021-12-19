@@ -4,11 +4,13 @@ const jwt = require('jwt-simple');
 const app = require('../../src/app');
 
 const username = `${Date.now()}`;
+const email = `${Date.now()}@gmail.com`;
 const secret = 'CdTp!DWM@202122';
 const MAIN_ROUTE = '/v1/users';
-const email = `${Date.now()}@gmail.com`
 
 let user;
+let userToDelete;
+let userToUpdate;
 let userAdmin = {
   firstName: 'Pedro',
   lastName: 'Martins',
@@ -22,8 +24,11 @@ beforeAll(async () => {
   user = { ...res[0] };
   user.token = jwt.encode(user, secret);
   const res2 = await app.services.user.save({ firstName: 'User', lastName: 'ToDelete', username: `${Date.now()}`, password: '12345', email: `${Date.now()}@gmail.com` });
-  userToDelete = { ...res[0] };
+  userToDelete = { ...res2[0] };
   userToDelete.token = jwt.encode(userToDelete, secret);
+  const res3 = await app.services.user.save({ firstName: 'User', lastName: 'ToUpdate', username: `${Date.now()}`, password: '12345', email: `${Date.now()}@gmail.com` });
+  userToUpdate = { ...res3[0] };
+  userToUpdate.token = jwt.encode(userToUpdate, secret);
 });
 
 test('Test #1 - Listar os utilizadores', () => {
@@ -136,21 +141,16 @@ test('Test #4 - Eliminar User', () => {
     });
 });
 
-// //por os testes abaixo dentro deste describe
+test('Test #5 - Alterar info de utilizador por Id', async () => {
 
-
-// test('Test #5 - Alterar info de utilizador por Id', async () => {
-//   return app.db(MAIN_ROUTE)
-//     .insert({ firstName: 'OldName', lastName: 'Manuel', username: `${Date.now()}`, 
-//     email: `${Date.now()}@gmail.com`, password: '12345'}, ['id'])
-//     .then((acc) => request(app).put(`${MAIN_ROUTE}/${acc[0].id}`)
-//       .set('authorization', `bearer ${user.token}`)
-//       .send({ firstName: 'NewName' }))
-//     .then((res) => {
-//       expect(res.status).toBe(200);
-//       expect(res.body.firstName).toBe('NewName');
-//     });
-// });
+  return request(app).put(`${MAIN_ROUTE}/${userToUpdate.id}`)
+      .set('authorization', `bearer ${userToUpdate.token}`)
+      .send({ firstName: 'NewName' })
+    .then((res) => {
+      expect(res.status).toBe(200);
+      expect(res.body.firstName).toBe('NewName');
+    });
+});
 
 
 

@@ -33,5 +33,20 @@ module.exports = (app) => {
     return app.db('users').insert(newUser, ['id', 'firstName', 'lastName','email', 'username' ]);
   };
 
-  return { findAll, save, findOne };
+  const remove = async (id) => {
+    const user = await app.services.user.findOne({ id: id });
+    if (!user) throw new ValidationError('O User não existe na BD');
+
+    return app.db('users')
+      .where({ id })
+      .del();
+  };
+
+  const update = (id, user) => {
+    return app.db('users')
+      .where({ id })
+      .update(user, '*');
+  };
+
+  return { findAll, save, findOne, remove, update };
 };
