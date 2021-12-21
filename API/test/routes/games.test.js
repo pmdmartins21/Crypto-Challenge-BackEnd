@@ -28,7 +28,7 @@ test('Teste #13 - Criar um novo jogo', () => {
     })
     .then((res) => {
       expect(res.status).toBe(201);
-      expect(res.body.startDate).toBe(startDate);
+      expect(new Date(res.body.startDate)).toEqual(startDate);
     });
 });
 test('Teste #14 - Listar um jogo por id', () => {
