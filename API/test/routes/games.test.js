@@ -12,6 +12,7 @@ const username = `${Date.now()}`;
 const email = `${Date.now()}@gmail.com`;
 
 let user;
+let endDate;
 
 //Apenas o admin pode criar jogos
 beforeAll(async () => {
@@ -33,29 +34,27 @@ test('Teste #13 - Criar um novo jogo', () => {
 });
 test('Teste #14 - Listar um jogo por id', () => {
   return app.db('games')
-    .insert({ startDate: startDate, endDate: Date.now()}, ['id'])
+    .insert({ startDate: moment(startDate), endDate: moment(startDate).add(5,'minutes')}, ['id'])
     .then((game) => request(app).get(`${MAIN_ROUTE}/${game[0].id}`)
       .set('authorization', `bearer ${user.token}`))
     .then((res) => {
       expect(res.status).toBe(200);
-      expect(res.body.startDate).toBe(startDate);
-      expect(res.body).toHaveLength(1);
+      expect(new Date(res.body.startDate)).toEqual(startDate);
     });
 });
 
 test('Teste #15 - definir o inicio-fim do jogo', () => {
-  const newStartDate = Date.now();
-  const newEndDate = Date.now();
+  const newStartDate = new Date();
+  const newEndDate = moment(newStartDate).add(5,'minutes');
 
   return app.db('games')
-    .insert({ startDate: startDate, endDate: Date.now()}, ['id'])
+    .insert({ startDate: moment(startDate), endDate: moment(startDate).add(5,'minutes')}, ['id'])
     .then((game) => request(app).put(`${MAIN_ROUTE}/${game[0].id}`)
       .set('authorization', `bearer ${user.token}`)
       .send({ startDate: newStartDate, endDate: newEndDate }))
     .then((res) => {
       expect(res.status).toBe(200);
-      expect(res.body.startDate).toBe(newStartDate);
-      expect(res.body.endDate).toBe(newEndDate);
-      expect(res.body).toHaveLength(1);
+      expect(new Date(res.body.startDate)).toEqual(new Date(newStartDate));
+      expect(new Date(res.body.endDate)).toEqual(new Date(newEndDate));
     });
 });

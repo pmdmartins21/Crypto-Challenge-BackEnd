@@ -9,7 +9,7 @@ exports.up = (knex) => {
       .references('id')
       .inTable('games')
       .notNull();
-      t.decimal('cashBalance', 15, 2).notNull().defaultTo(50000);
+      t.decimal('cashBalance', 15, 2).defaultTo(50000);
   });
 };
 
