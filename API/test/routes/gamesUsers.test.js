@@ -10,7 +10,7 @@ const email = `${Date.now()}@ipca.pt`;
 const startDate = new Date();
 const secret = 'CdTp!DWM@202122';
 const MAIN_ROUTE = '/v1/gamesUsers';
-const crypto = `${Date.now()}crypto`
+const crypto = `${Date.now()}crypto`;
 const cryptoCost = 10000;
 
 let testGame;

@@ -9,14 +9,15 @@ module.exports = (app) => {
     return app.db('games_users').where(filter).first();
   };
 
-  // const save = async (game) => {
-  //   if (!game.startDate) throw new ValidationError('StartDate é um atributo obrigatório');
+  const save = async (game_user) => {
+    if (!game_user.user_id) throw new ValidationError('USER_ID é um atributo obrigatório');
+    if (!game_user.game_id) throw new ValidationError('GAME_ID é um atributo obrigatório');
 
-  //   // const gameDb = await findOne({ name: crypto.name });
-  //   // if (cryptoDb) throw new ValidationError('Name duplicado na Bd');
+    // const gameDb = await findOne({ name: crypto.name });
+    // if (cryptoDb) throw new ValidationError('Name duplicado na Bd');
 
-  //   return app.db('games').insert(game, ['id', 'startDate']);
-  // };
+    return app.db('games_users').insert(game_user, ['*']);
+  };
 
   const update = async (gameUserId, cryptoCost) => {
     const gameUserDb = await findOne({ id: gameUserId });
@@ -39,5 +40,5 @@ module.exports = (app) => {
   //     .del();
   // };
 
-  return { findAll, findOne, update };
+  return { findAll, findOne, update, save };
 };
