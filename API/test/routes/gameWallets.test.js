@@ -29,12 +29,13 @@ beforeAll(async () => {
   testGameUser = { ...res3[0] };
   const res4 = await app.services.crypto.save({ name: crypto });
   testCrypto = { ...res4[0] };
+
   const res5 = await app.services.gameWallet.save({ games_users_id: testGameUser.id, crypto_id: testCrypto.id, amount:5 });
   testGameWallet = { ...res5[0] };
 });
 
 test('Test #17.1 - Obter a gameWallet de um utilizador', () => {
-  return request(app).get(`${MAIN_ROUTE}/${testGame.id}/${user.id}`)
+  return request(app).get(`${MAIN_ROUTE}/${testGameUser.id}`)
     .set('authorization', `bearer ${user.token}`)
     .then((res) => {
       expect(res.status).toBe(200);
@@ -45,16 +46,18 @@ test('Test #17.1 - Obter a gameWallet de um utilizador', () => {
     });
 });
 
-// test('Test #17.2 - Obter as coins de outros utilizadores', () => {
-//   return app.db('/v1/users')
-//     .insert({ firstName: 'Account', lastName: 'Invalid', email: `${Date.now()}@ipca.pt`, username: `${Date.now()}`, password: '12345'}, ['id'])
-//     .then((newUser) => request(app).get(`${MAIN_ROUTE}/${testGame.id}/${newUser.id}`)
-//       .set('authorization', `bearer ${user.token}`))
-//     .then((res) => {
-//       expect(res.status).toBe(403);
-//       expect(res.body.error).toBe('Não tem acesso ao recurso solicitado');
-//     });
-// });
+test('Test #17.2 - Obter as coins de outros utilizadores', async() => {
+  const newRes = await app.services.user.save({ firstName: 'Account', lastName: 'Invalid', email: `${Date.now()}@ipca.pt`, username: `${Date.now()}`, password: '12345'});
+  invalidUser = { ...newRes[0] };
+  invalidUser.token = jwt.encode(invalidUser, secret);
+
+  return request(app).get(`${MAIN_ROUTE}/${testGameUser.id}`)
+      .set('authorization', `bearer ${invalidUser.token}`)
+    .then((res) => {
+      expect(res.status).toBe(403);
+      expect(res.body.error).toBe('Não tem acesso ao recurso solicitado');
+    });
+});
 
 // test('Teste #17.3 - Tentar um transaçao de venda sem possuir a cripto em carteira, ou em quantidade suficiente',  () => {
 //   return app.db('gameWallet').insert(

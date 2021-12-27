@@ -4,13 +4,13 @@ const ForbiddenError = require('../errors/forbiddenError');
 module.exports = (app) => {
   const router = express.Router();
 
-  // router.param('id', (req, res, next) => {
-  //   app.services.game.findOne({ id: req.params.id })
-  //     .then((game) => {
-  //       if (user.id !== req.user.id) throw new ForbiddenError();
-  //       else next();
-  //     }).catch((err) => next(err));
-  // });
+  router.param('id', (req, res, next) => {
+    app.services.gameUser.findOne({ id: req.params.id })
+      .then((gameUser) => {
+        if (gameUser.user_id !== req.user.id) throw new ForbiddenError();
+        else next();
+      }).catch((err) => next(err));
+  });
 
   // router.get('/', (req, res, next) => {
   //   app.services.game.findAll()

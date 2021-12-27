@@ -4,13 +4,13 @@ const ForbiddenError = require('../errors/forbiddenError');
 module.exports = (app) => {
   const router = express.Router();
 
-  // router.param('id', (req, res, next) => {
-  //   app.services.game.findOne({ id: req.params.id })
-  //     .then((game) => {
-  //       if (user.id !== req.user.id) throw new ForbiddenError();
-  //       else next();
-  //     }).catch((err) => next(err));
-  // });
+  router.param('user_id', (req, res, next) => {
+    app.services.gameWallet.findOne({ id: req.params.id })
+      .then((gameWallet) => {
+        if (user.id !== req.user.id) throw new ForbiddenError();
+        else next();
+      }).catch((err) => next(err));
+  });
 
   // router.get('/', (req, res, next) => {
   //   app.services.game.findAll()
@@ -27,14 +27,14 @@ module.exports = (app) => {
   //   }
   // });
 
-  router.get('/:game_id/:user_id', (req, res, next) => {
-    let resultInside;
-    app.services.gameUser.findOne({ game_id: req.params.game_id, user_id: req.params.user_id })
+  router.get('/:game_user_id', (req, res, next) => {
+    let allresults;
+    app.services.gameUser.findOne({ id: req.params.game_user_id })
       .then(async(gameUser) => {
-       // if (result.id !== req.user.id) return res.status(403).json({ error: 'Não tem acesso ao recurso solicitado' });
-      resultInside =  await app.services.gameWallet.findAll({games_users_id: gameUser.id})
+       if (gameUser.user_id !== req.user.id) return res.status(403).json({ error: 'Não tem acesso ao recurso solicitado' });
+       allresults =  await app.services.gameWallet.findAll({games_users_id: gameUser.id})
       
-      return res.status(200).json(resultInside);
+      return res.status(200).json(allresults);
         })
       .catch((err) => next(err));
   });
