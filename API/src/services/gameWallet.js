@@ -19,17 +19,31 @@ module.exports = (app) => {
     return app.db('game_wallet').insert(gameWallet, ['*']);
   };
 
-  // const update = async (gameUserId, cryptoCost) => {
-  //   const gameUserDb = await findOne({ id: gameUserId });
-  //   let userBalance = Number(gameUserDb.cashBalance);
-  //   if(userBalance < cryptoCost.cost) throw new ValidationError('Não tem saldo suficiente para a transação');
-    
-  //   let newBalance = gameUserDb.cashBalance - cryptoCost.cost;
+  //só preciso atualizar as coins que foram compradas, assumindo que já existem na carteira do jogador aquando o inicio do jogo. (Popular automaticamente a '0')
+  //cryptoAmmount é positivo para compras, negativo para vendas
+  const update = async (gameUserId, cryptoAmmount, cryptoID) => {
+    let updatedUserCryptoWallet = await findOne({ games_users_id: gameUserId, crypto_id: cryptoID});
+    updatedUserCryptoWallet.amount = Number(updatedUserCryptoWallet.amount);
 
-  //   return app.db('game_wallet')
-  //     .where({ id: gameUserId })
-  //     .update({cashBalance: newBalance}, '*');
+    if(cryptoAmmount > 0) {
+      updatedUserCryptoWallet.amount += cryptoAmmount;
+    } 
+    else{
+      if(updatedUserCryptoWallet.amount < Math.abs(cryptoAmmount)) throw new ValidationError('Não tem cryptos suficientes para a transação');
+      updatedUserCryptoWallet.amount += cryptoAmmount;
+    }
+
+    return app.db('game_wallet')
+      .where({ id: updatedUserCryptoWallet.id })
+      .update({ amount: updatedUserCryptoWallet.amount }, '*');
+  };
+
+  // const checkTotalCrypto = async (gameUserId, cryptoID) => {
+  //   const totalCrypto = await findOne({ games_users_id: gameUserId, crypto_id: cryptoID });
+  //   totalCrypto.amount = Number(totalCrypto.amount);
+  //   return 
   // };
+
 
   // const remove = async (id) => {
   //   const game = await app.services.game.findOne({ id: id });
@@ -40,5 +54,5 @@ module.exports = (app) => {
   //     .del();
   // };
 
-  return { findAll, findOne, save };
+  return { findAll, findOne, save, update };
 };

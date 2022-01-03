@@ -31,9 +31,9 @@ module.exports = (app) => {
     let allresults;
     app.services.gameUser.findOne({ id: req.params.game_user_id })
       .then(async(gameUser) => {
-       if (gameUser.user_id !== req.user.id) return res.status(403).json({ error: 'Não tem acesso ao recurso solicitado' });
-       allresults =  await app.services.gameWallet.findAll({games_users_id: gameUser.id})
-      
+        if (gameUser.user_id !== req.user.id) return res.status(403).json({ error: 'Não tem acesso ao recurso solicitado' });
+        allresults =  await app.services.gameWallet.findAll({games_users_id: gameUser.id});
+        
       return res.status(200).json(allresults);
         })
       .catch((err) => next(err));

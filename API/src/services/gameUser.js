@@ -1,3 +1,5 @@
+const { use } = require('passport');
+const { user } = require('pg/lib/defaults');
 const ValidationError = require('../errors/validationError');
 
 module.exports = (app) => {
@@ -19,17 +21,27 @@ module.exports = (app) => {
     return app.db('games_users').insert(game_user, ['*']);
   };
 
-  const update = async (gameUserId, cryptoCost) => {
-    const gameUserDb = await findOne({ id: gameUserId });
-    let userBalance = Number(gameUserDb.cashBalance);
-    if(userBalance < cryptoCost.cost) throw new ValidationError('Não tem saldo suficiente para a transação');
-    
-    let newBalance = gameUserDb.cashBalance - cryptoCost.cost;
+  const update = async (gameUserId, cryptoValue) => {
+    let userBalance = await checkBalance(gameUserId);
 
+    if (cryptoValue > 0) {
+      userBalance += cryptoValue;
+    }
+    else {
+      if(userBalance < Math.abs(cryptoValue)) throw new ValidationError('Não tem saldo suficiente para a transação');
+      userBalance += cryptoValue;
+    } 
+    
     return app.db('games_users')
       .where({ id: gameUserId })
-      .update({cashBalance: newBalance}, '*');
+      .update({cashBalance: userBalance}, '*');
   };
+
+  //com o findOne não deve ser necessário esta parte...
+  const checkBalance = async (gameUserId) => {
+    const gameUserDb = await findOne({ id: gameUserId });
+    return Number(gameUserDb.cashBalance);
+  }
 
   // const remove = async (id) => {
   //   const game = await app.services.game.findOne({ id: id });
