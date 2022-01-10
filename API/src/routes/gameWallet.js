@@ -27,12 +27,26 @@ module.exports = (app) => {
   //   }
   // });
 
+  //retornar a carteira com todas as moedas + o saldo em dinheiro disponivel
   router.get('/:game_user_id', (req, res, next) => {
-    let allresults;
+    app.services.gameUser.findOne({ id: req.params.game_user_id })
+      .then(async(gameUser) => {
+        if (gameUser.user_id !== req.user.id) return res.status(403).json({ error: 'Não tem acesso ao recurso solicitado' });
+        return await app.services.gameWallet.getCompleteWallet( gameUser.id, gameUser.cashBalance )
+        // allresults =  await app.services.gameWallet.findAll({games_users_id: gameUser.id});
+        // allresults[allresults.length] = {cashBalance: gameUser.cashBalance};
+        })
+        .then((results) => res.status(200).json(results))
+      .catch((err) => next(err));
+  });
+
+  router.get('/total/:game_user_id', (req, res, next) => {
+    let allresults = [];
     app.services.gameUser.findOne({ id: req.params.game_user_id })
       .then(async(gameUser) => {
         if (gameUser.user_id !== req.user.id) return res.status(403).json({ error: 'Não tem acesso ao recurso solicitado' });
         allresults =  await app.services.gameWallet.findAll({games_users_id: gameUser.id});
+        allresults[allresults.length] = {cashBalance: gameUser.cashBalance};
         
       return res.status(200).json(allresults);
         })

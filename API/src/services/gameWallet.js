@@ -9,6 +9,13 @@ module.exports = (app) => {
     return app.db('game_wallet').where(filter).first();
   };
 
+  
+  const getCompleteWallet = async (gameUserId, cashBalance) => {
+    let coins = await app.db('game_wallet').where({games_users_id: gameUserId}).select('*');
+    coins[coins.length] = {cashBalance: cashBalance};
+    return coins;
+  };
+
   const save = async (gameWallet) => {
     if (!gameWallet.games_users_id) throw new ValidationError('Game_User_ID é um atributo obrigatório');
     if (!gameWallet.crypto_id) throw new ValidationError('Crypto_ID é um atributo obrigatório');
@@ -20,17 +27,17 @@ module.exports = (app) => {
   };
 
   //só preciso atualizar as coins que foram compradas, assumindo que já existem na carteira do jogador aquando o inicio do jogo. (Popular automaticamente a '0')
-  //cryptoAmmount é positivo para compras, negativo para vendas
-  const update = async (gameUserId, cryptoAmmount, cryptoID) => {
-    let updatedUserCryptoWallet = await findOne({ games_users_id: gameUserId, crypto_id: cryptoID});
+  const update = async (trans) => {
+    let updatedUserCryptoWallet = await findOne({ games_users_id: trans.games_users_id, crypto_id: trans.crypto_id});
     updatedUserCryptoWallet.amount = Number(updatedUserCryptoWallet.amount);
 
-    if(cryptoAmmount > 0) {
-      updatedUserCryptoWallet.amount += cryptoAmmount;
+    // Compra
+    if(trans.amount > 0) {
+      updatedUserCryptoWallet.amount += trans.amount;
     } 
-    else{
-      if(updatedUserCryptoWallet.amount < Math.abs(cryptoAmmount)) throw new ValidationError('Não tem cryptos suficientes para a transação');
-      updatedUserCryptoWallet.amount += cryptoAmmount;
+    else{ // Venda
+      if(updatedUserCryptoWallet.amount < Math.abs(trans.amount)) throw new ValidationError('Não tem cryptos suficientes para a transação');
+      updatedUserCryptoWallet.amount += trans.amount;
     }
 
     return app.db('game_wallet')
@@ -54,5 +61,5 @@ module.exports = (app) => {
   //     .del();
   // };
 
-  return { findAll, findOne, save, update };
+  return { findAll, findOne, save, update, getCompleteWallet };
 };

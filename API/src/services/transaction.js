@@ -2,13 +2,21 @@ const ValidationError = require('../errors/validationError');
 const Transaction = require('../../src/models/transaction');
 
 module.exports = (app) => {
-  // const find = (userId, filter = {}) => {
-  //   return app.db('transactions')
-  //     .join('accounts', 'accounts.id', 'acc_id')
-  //     .where(filter)
-  //     .andWhere('accounts.user_id', '=', userId)
-  //     .select();
-  // };
+
+  
+  const findAll = async ( filter = {}) => {
+
+    //get all games from this user
+    let gamesFromUser = await app.services.gameUser.findAllGameUsersID({user_id: filter.id});
+    let gamesIds = [];
+    for(let i = 0; i < gamesFromUser.length; i++) {
+      gamesIds.push(gamesFromUser[i].id);
+    };
+
+    return app.db('transactions')
+      .whereIn('games_users_id', gamesIds)
+      .select('*');
+  };
 
   // const findOne = (filter = {}) => {
   //   return app.db('transactions')
@@ -16,7 +24,7 @@ module.exports = (app) => {
   //     .first();
   // };
 
-  const save = (trans) => {
+  const save = async (trans) => {
     // if (!trans.desc) throw new ValidationError('A DESCRIÇÃO é um atributo obrigatório');
     // if (!trans.ammount) throw new ValidationError('O VALOR é um atributo obrigatório');
     // if (!trans.date) throw new ValidationError('A DATA é um atributo obrigatório');
@@ -25,9 +33,10 @@ module.exports = (app) => {
     // if (!(trans.type === 'I' || trans.type === 'O')) throw new ValidationError('O TIPO tem um valor inválido');
 
     //update game user
-
+    await app.services.gameUser.update(trans);
     //update game wallet
-    
+    await app.services.gameWallet.update(trans);
+
     const newTrans = { ...trans };
     if ((trans.type === 'B' && trans.ammount < 0)
       || (trans.type === 'S' && trans.ammount > 0)) {
@@ -51,6 +60,6 @@ module.exports = (app) => {
   };
 
   return {
-     save, update, remove,
+    save, update, remove, findAll
   };
 };

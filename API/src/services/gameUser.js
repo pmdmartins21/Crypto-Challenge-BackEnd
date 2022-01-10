@@ -7,6 +7,10 @@ module.exports = (app) => {
     return app.db('games_users').where(filter).select('*');
   };
 
+  const findAllGameUsersID = (filter = {}) => {
+    return app.db('games_users').where(filter).select('id');
+  };
+
   const findOne = (filter = {}) => {
     return app.db('games_users').where(filter).first();
   };
@@ -21,19 +25,21 @@ module.exports = (app) => {
     return app.db('games_users').insert(game_user, ['*']);
   };
 
-  const update = async (gameUserId, cryptoValue) => {
-    let userBalance = await checkBalance(gameUserId);
+  const update = async (trans) => {
+    let transValue = trans.amount * trans.crypto_value;
+    let userBalance = await checkBalance(trans.games_users_id);
 
-    if (cryptoValue > 0) {
-      userBalance += cryptoValue;
+    //Amount < 0 == Venda
+    if (transValue < 0) {
+      userBalance += Math.abs(transValue);
     }
-    else {
-      if(userBalance < Math.abs(cryptoValue)) throw new ValidationError('Não tem saldo suficiente para a transação');
-      userBalance += cryptoValue;
+    else { // Compra
+      if(userBalance < transValue) throw new ValidationError('Não tem saldo suficiente para a transação');
+      userBalance -= transValue;
     } 
     
     return app.db('games_users')
-      .where({ id: gameUserId })
+      .where({ id: trans.games_users_id })
       .update({cashBalance: userBalance}, '*');
   };
 
@@ -52,5 +58,5 @@ module.exports = (app) => {
   //     .del();
   // };
 
-  return { findAll, findOne, update, save };
+  return { findAllGameUsersID, findAll, findOne, update, save };
 };
