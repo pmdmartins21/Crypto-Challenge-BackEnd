@@ -34,6 +34,7 @@ beforeAll(async () => {
   testGameWallet = { ...res5[0] };
 });
 
+//Gamewallet inclusive o cashbalance
 test('Test #17.1 - Obter a gameWallet de um utilizador', () => {
   return request(app).get(`${MAIN_ROUTE}/${testGameUser.id}`)
     .set('authorization', `bearer ${user.token}`)
@@ -43,6 +44,7 @@ test('Test #17.1 - Obter a gameWallet de um utilizador', () => {
       expect(res.body[0]).toHaveProperty('crypto_id');
       expect(res.body[0].amount).toBe('5.00');
       expect(res.body[0].games_users_id).toBe(testGameUser.id);
+      expect(res.body[res.body.length - 1]).toHaveProperty('cashBalance');
     });
 });
 

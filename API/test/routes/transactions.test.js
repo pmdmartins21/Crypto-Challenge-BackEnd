@@ -18,9 +18,10 @@ let userA;
 let userB;
 let userC;
 let testGameA;
+let testGameB;
 let testGameAUserA;
 let testGameAUserB;
-let testGameAUserC;
+let testGameBUserA;
 let testCrypto;
 
 
@@ -46,11 +47,15 @@ beforeAll(async () => {
   testGameAUserA = { ...res2[0] };
   const res3 = await app.services.gameUser.save({ user_id: userB.id, game_id: testGameA.id});
   testGameAUserB = { ...res3[0] };
-  const res4 = await app.services.crypto.save({ name: crypto });
-  testCrypto = { ...res4[0] };
+  const res4 = await app.services.game.save({ startDate: moment(startDate), endDate: moment(startDate).add(5,'minutes') });
+  testGameB = { ...res4[0] };
+  const res5 = await app.services.gameUser.save({ user_id: userA.id, game_id: testGameB.id});
+  testGameBUserA = { ...res5[0] };
+  const res7 = await app.services.crypto.save({ name: crypto });
+  testCrypto = { ...res7[0] };
 });
 
-test('Teste #19.01 -Inserir uma transação de compra', () => {
+test('Teste #19.1 -Inserir uma transação de compra', () => {
   const transaction = 
     { games_users_id: testGameAUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100 };
     //{ games_users_id: testGameAUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'S', amount: -2, crypto_value: 100 },
@@ -59,31 +64,68 @@ test('Teste #19.01 -Inserir uma transação de compra', () => {
     return app.db('game_wallet').insert({
       games_users_id: transaction.games_users_id, crypto_id: transaction.crypto_id, amount: 0 
     })
-      .then(() =>  request(app).post(`${MAIN_ROUTE}/test`)
+      .then(() =>  request(app).post(`${MAIN_ROUTE}`)
       .set('authorization', `bearer ${userA.token}`)
       .send(transaction)
       .then((res) => {
         expect(res.status).toBe(201);
         expect(res.body).toHaveProperty('crypto_value');
+
         expect(res.body.type).toBe('B');
         expect(res.body.amount).toBe('5.00');
       }));
 });
 
-// test('Teste #19.1 - Listar todas as transaçoes de utilizador', () => {
-//   return app.db('transactions').insert([
-//     { games_users_id: testGameAUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100 },
-//     { games_users_id: testGameAUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'S', amount: -2, crypto_value: 100 },
-//     { games_users_id: testGameAUserB.id, crypto_id: testCrypto.id, date: new Date(),  type: 'S', amount: -5, crypto_value: 100 },
-//   ]).then(() => request(app).get(MAIN_ROUTE)
-//     .set('authorization', `bearer ${userA.token}`)
-//     .then((res) => {
-//       expect(res.status).toBe(200);
-//       expect(res.body).toHaveLength(2);
-//       expect(res.body[0].desc).toBe('B');
-//       expect(res.body[0].amount).toBe(5);
-//     }));
-// });
+test('Teste #19.2 -Inserir uma transação de venda', () => {
+  const transaction = 
+    //{ games_users_id: testGameAUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100 };
+    { games_users_id: testGameAUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'S', amount: -2, crypto_value: 100 };
+    //{ games_users_id: testGameAUserB.id, crypto_id: testCrypto.id, date: new Date(),  type: 'S', amount: -5, crypto_value: 100 }
+    
+    return request(app).post(`${MAIN_ROUTE}`)
+      .set('authorization', `bearer ${userA.token}`)
+      .send(transaction)
+      .then((res) => {
+        expect(res.status).toBe(201);
+        expect(res.body).toHaveProperty('crypto_value');
+        expect(res.body.type).toBe('S');
+        expect(res.body.amount).toBe('-2.00');
+      });
+});
+
+test('Teste #19.3 -Tentar uma compra sem saldo suficiente', () => {
+  const transaction = 
+    { games_users_id: testGameAUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'B', amount: 5000, crypto_value: 100 };
+    //{ games_users_id: testGameAUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'S', amount: -2, crypto_value: 100 },
+    //{ games_users_id: testGameAUserB.id, crypto_id: testCrypto.id, date: new Date(),  type: 'S', amount: -5, crypto_value: 100 }
+    
+    return request(app).post(`${MAIN_ROUTE}`)
+      .set('authorization', `bearer ${userA.token}`)
+      .send(transaction)
+      .then((res) => {
+        expect(res.status).toBe(400);
+        expect(res.body.error).toBe('Não tem saldo suficiente para a transação');
+      });
+});
+//TODO restringir acessos
+test('Teste #19.4 - Listar todas as transaçoes de utilizador', () => {
+  return app.db('game_wallet').insert({
+    games_users_id: testGameBUserA.id, crypto_id: testCrypto.id, amount: 0 
+  }).then(() => 
+    request(app).post(`${MAIN_ROUTE}`)
+      .set('authorization', `bearer ${userA.token}`)
+      .send(
+        { games_users_id: testGameBUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100 }
+      )
+      .then(() => request(app).get(`${MAIN_ROUTE}/${userA.id}`)
+      .set('authorization', `bearer ${userA.token}`)
+      .then((res) => {
+        expect(res.status).toBe(200);
+        expect(res.body).toHaveLength(3);
+        expect(res.body[1].type).toBe('S');
+        expect(res.body[0].amount).toBe('5.00');
+      }))); 
+});
 
 // test('Teste #19.2 - Aceder a transaçoes de outro utilizador', () => {
 //   return app.db('transactions').insert(
