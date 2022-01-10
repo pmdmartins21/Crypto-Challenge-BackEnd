@@ -9,7 +9,7 @@ exports.up = (knex) => {
       .references('id')
       .inTable('cryptos')
       .notNull();
-    t.decimal('amount', 15, 2).notNull().defaultTo(0);
+    t.decimal('amount', 15, 2).defaultTo(0);
   });
 };
 

@@ -1,3 +1,5 @@
+const { now } = require("moment");
+
 exports.up = (knex) => {
   return knex.schema.createTable('transactions', (t) => {
     t.increments('id').primary();
@@ -9,7 +11,7 @@ exports.up = (knex) => {
       .references('id')
       .inTable('cryptos')
       .notNull();
-    t.date('date').notNull();
+    t.timestamp('date').notNull();
     t.enu('type', ['B', 'S']).notNull(); //Type "Buy" or "Sell"
     t.decimal('amount', 15, 2).notNull();
     t.decimal('crypto_value', 15, 2).notNull(); //Crypto value at the time of the transaction

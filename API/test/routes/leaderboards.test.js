@@ -17,7 +17,7 @@ beforeAll(async () => {
 });
 
 
-test('Teste #13 - Obter o leaderboard de um determinado jogo', () => {
+test('Teste #16 - Obter o leaderboard de um determinado jogo', () => {
   return app.db('games_users').insert(
     {users_id: user.id, game_id: testGame.id, cashBalance: 20000 }, ['id'],
     )

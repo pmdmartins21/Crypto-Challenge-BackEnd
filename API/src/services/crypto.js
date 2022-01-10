@@ -18,5 +18,20 @@ module.exports = (app) => {
     return app.db('cryptos').insert(crypto, ['id', 'name']);
   };
 
-  return { findAll, findOne, save };
+  const update = (id, crypto) => {
+    return app.db('cryptos')
+      .where({ id })
+      .update(crypto, '*');
+  };
+
+  const remove = async (id) => {
+    const crypto = await app.services.crypto.findOne({ id: id });
+    if (!crypto) throw new ValidationError('A Crypto não existe na BD');
+
+    return app.db('cryptos')
+      .where({ id })
+      .del();
+  };
+
+  return { findAll, findOne, save, update, remove };
 };

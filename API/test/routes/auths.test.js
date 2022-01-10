@@ -5,9 +5,9 @@ const email = `${Date.now()}@ipca.pt`;
 const username = `${Date.now()}`;
 
 
-test('Teste #13 - Receber token ao autenticar', () => {
+test('Teste #11.1 - Receber token ao autenticar', () => {
   return app.services.user.save(
-    { firstName: 'Pedro', lastName: 'Auth', email: email, username: username, password: '12345' },
+    { firstName: 'Pedro', lastName: 'Auth', username: username, password: '12345', email: email, },
   ).then(() => request(app).post('/auth/signin')
     .send({ username: username, password: '12345' }))
     .then((res) => {
@@ -16,7 +16,7 @@ test('Teste #13 - Receber token ao autenticar', () => {
     });
 });
 
-test('Teste #14 - Tentativa de autenticaçao errada', () => {
+test('Teste #11.2 - Tentativa de autenticaçao errada', () => {
   const wrongUsername = `${Date.now()}`;
   return app.services.user.save(
     { firstName: 'Pedro', lastName: 'Auth', email: `${Date.now()}@ipca.pt`, username: wrongUsername, password: '12345' },
@@ -28,7 +28,7 @@ test('Teste #14 - Tentativa de autenticaçao errada', () => {
     });
 });
 
-test('Teste #15 - Tentativa de autenticaçao com utilizador errado', () => {
+test('Teste #11.3 - Tentativa de autenticaçao com utilizador errado', () => {
   const invalidUsername = `${Date.now()}`;
   return request(app).post('/auth/signin')
     .send({ username: invalidUsername, password: '67890' })
@@ -38,14 +38,15 @@ test('Teste #15 - Tentativa de autenticaçao com utilizador errado', () => {
     });
 });
 
-test('Teste #16 - Aceder a rotas protegidas', () => {
+test('Teste #11.4 - Aceder a rotas protegidas', () => {
   return request(app).get('/v1/users')
     .then((res) => {
       expect(res.status).toBe(401);
     });
 });
 
-test('Teste #17 - Criar utilizador', () => {
+
+test('Teste #12 - Criar utilizador', () => {
   const newUsername = `${Date.now()}`;
   return request(app).post('/auth/signup')
     .send({ firstName: 'Pedro', lastName: 'Signup', email: `${Date.now()}@ipca.pt`, username: newUsername, password: '12345' })
@@ -57,3 +58,4 @@ test('Teste #17 - Criar utilizador', () => {
       expect(res.body).not.toHaveProperty('password');
   });
 });
+
