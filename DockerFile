@@ -1,0 +1,21 @@
+#Image specification
+FROM node:latest
+
+#Environment variable settings
+ENV NODE_ENV="development"
+
+# Create app directory
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+
+
+# Bundle app source
+COPY . ./cryptochallenge
+
+# Install dependencies
+COPY package.json ./cryptochallenge
+COPY yarn.lock ./cryptochallenge
+
+# Exports
+EXPOSE 5000
+# CMD [ "yarn", "start" ]

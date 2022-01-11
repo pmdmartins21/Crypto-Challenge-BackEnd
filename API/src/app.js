@@ -1,10 +1,13 @@
 const app = require('express')();
 const consign = require('consign');
+const cors = require('cors');
 
 const knex = require('knex');
 const knexfile = require('../knexfile');
 
+app.use(cors());
 app.db = knex(knexfile.test);
+
 
 consign({ cwd: 'src', verbose: false })
   .include('./config/passport.js')
