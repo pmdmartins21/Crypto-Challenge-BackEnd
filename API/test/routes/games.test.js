@@ -29,6 +29,7 @@ test('Teste #13 - Criar um novo jogo', () => {
     })
     .then((res) => {
       expect(res.status).toBe(201);
+      expect(res.body.totalSeconds).toBe(300);
       expect(new Date(res.body.startDate)).toEqual(startDate);
     });
 });
@@ -51,7 +52,7 @@ test('Teste #15 - definir o inicio-fim do jogo', () => {
     .insert({ startDate: moment(startDate), endDate: moment(startDate).add(5,'minutes')}, ['id'])
     .then((game) => request(app).put(`${MAIN_ROUTE}/${game[0].id}`)
       .set('authorization', `bearer ${user.token}`)
-      .send({ startDate: newStartDate, endDate: newEndDate }))
+      .send({ startDate: moment(newStartDate), endDate: moment(newEndDate) }))
     .then((res) => {
       expect(res.status).toBe(200);
       expect(new Date(res.body.startDate)).toEqual(new Date(newStartDate));

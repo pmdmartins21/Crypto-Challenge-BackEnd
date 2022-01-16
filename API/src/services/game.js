@@ -12,8 +12,11 @@ module.exports = (app) => {
   const save = async (game) => {
     if (!game.startDate) throw new ValidationError('StartDate é um atributo obrigatório');
 
-    // const gameDb = await findOne({ name: crypto.name });
-    // if (cryptoDb) throw new ValidationError('Name duplicado na Bd');
+    //TODO garantir que quando um user entra num jogo, que sao criadas as wallets das cryptos a 0.
+    var a = new Date(game.startDate);
+    var b = new Date(game.endDate);
+    var difference = (b - a) / 1000;
+    game.totalSeconds = difference;
 
     return app.db('games').insert(game, ['*']);
   };
