@@ -1,4 +1,9 @@
 const ValidationError = require('../errors/validationError');
+const bitcoinDateEntries = 1615;
+const ethereumDateEntries = 1615;
+const cardanoDateEntries = 1371;
+const dogecoinDateEntries = 2760;
+
 
 module.exports = (app) => {
   const findAll = (filter = {}) => {
@@ -10,14 +15,20 @@ module.exports = (app) => {
   };
 
   const save = async (game) => {
+
     if (!game.startDate) throw new ValidationError('StartDate é um atributo obrigatório');
 
-    //TODO garantir que quando um user entra num jogo, que sao criadas as wallets das cryptos a 0.
+    //TODO garantir que quando um user entra num jogo, que sao criadas as wallets das cryptos a 0 e é definido o ponto de inicio da sequencia das cryptos.
     var a = new Date(game.startDate);
     var b = new Date(game.endDate);
     var difference = (b - a) / 1000;
     game.totalSeconds = difference;
 
+    game.bitcoin_starting_point = Math.round(Math.random()*(bitcoinDateEntries - game.totalSeconds));
+    game.ethereum_starting_point = Math.round(Math.random()*(ethereumDateEntries - game.totalSeconds));
+    game.cardano_starting_point = Math.round(Math.random()*(cardanoDateEntries - game.totalSeconds));
+    game.dogecoin_starting_point = Math.round(Math.random()*(dogecoinDateEntries - game.totalSeconds));
+    
     return app.db('games').insert(game, ['*']);
   };
 
@@ -38,3 +49,5 @@ module.exports = (app) => {
 
   return { findAll, findOne, save, update, remove };
 };
+
+//TODO terminar jogo => vender cryptos ao preço do ultimo valor na timeseries do jogo.

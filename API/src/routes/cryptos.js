@@ -27,6 +27,15 @@ module.exports = (app) => {
       .catch((err) => next(err));
   });
 
+  router.get('/timeSeries/:game_id', (req, res, next) => {
+    app.services.crypto.getCryptoTimeSeries(req.params.game_id)
+      .then((result) => {
+        //if (req.user.isAdmin) return res.status(403).json({ error: 'Não tem acesso ao recurso solicitado' }); só para admins
+        return res.status(200).json(result);
+      })
+      .catch((err) => next(err));
+  });
+
   router.post('/', async (req, res, next) => {
     try {
       const result = await app.services.crypto.save(req.body);
