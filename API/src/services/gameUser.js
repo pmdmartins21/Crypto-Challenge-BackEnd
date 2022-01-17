@@ -15,14 +15,25 @@ module.exports = (app) => {
     return app.db('games_users').where(filter).first();
   };
 
-  const save = async (game_user) => {
-    if (!game_user.user_id) throw new ValidationError('USER_ID é um atributo obrigatório');
-    if (!game_user.game_id) throw new ValidationError('GAME_ID é um atributo obrigatório');
+  const save = async (newGameInfo) => {
+    let result;
 
-    // const gameDb = await findOne({ name: crypto.name });
-    // if (cryptoDb) throw new ValidationError('Name duplicado na Bd');
+    if (!newGameInfo.user_id) throw new ValidationError('USER_ID é um atributo obrigatório');
+    if (!newGameInfo.game_id) throw new ValidationError('GAME_ID é um atributo obrigatório');
 
-    return app.db('games_users').insert(game_user, ['*']);
+    const game_user_Db = await findOne(newGameInfo);
+    if (game_user_Db) throw new ValidationError('O user já está registado neste jogo');
+
+    
+    result = await app.db('games_users').insert(newGameInfo, ['*']);
+    
+    const cryptos = await app.services.crypto.findAll();
+
+    for(let i = 0; i< cryptos.length; i++) {
+      await app.services.gameWallet.save({games_users_id: result[0].id, crypto_id: cryptos[i].id});
+    }
+    return result[0];
+
   };
 
   const update = async (trans) => {

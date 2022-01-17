@@ -18,14 +18,13 @@ module.exports = (app) => {
   //     .catch((err) => next(err));
   // });
 
-  // router.post('/', async (req, res, next) => {
-  //   try {
-  //     const result = await app.services.game.save(req.body);
-  //     return res.status(201).json(result[0]);
-  //   } catch (err) {
-  //     return next(err);
-  //   }
-  // });
+  router.post('/:game_id/:user_id', async (req, res, next) => {
+    await app.services.gameUser.save({ game_id: req.params.game_id, user_id: req.params.user_id })
+    .then((result) => {
+      return res.status(201).json(result)
+    })
+      .catch((err) => next(err));
+      });
 
   // router.get('/:id', (req, res, next) => {
   //   app.services.game.findOne({ id: req.params.id })

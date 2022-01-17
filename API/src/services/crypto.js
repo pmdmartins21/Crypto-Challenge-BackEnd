@@ -1,4 +1,10 @@
 const ValidationError = require('../errors/validationError');
+const coins = [
+  'bitcoin',
+  'ethereum',
+  'cardano',
+  'dogecoin'
+];
 
 module.exports = (app) => {
   const findAll = (filter = {}) => {
@@ -33,5 +39,30 @@ module.exports = (app) => {
       .del();
   };
 
-  return { findAll, findOne, save, update, remove };
+  const getCryptoTimeSeries = async (game_id) => {
+    const game = await app.services.game.findOne({ id: parseInt(game_id) });
+    if (!game) throw new ValidationError('O jogo não existe na BD');
+
+    //loop para ir buscar a timeserie de cada uma das 4 moedas(BTC,ETH,ADA,DOGE)
+    let { bitcoin_starting_point } = game;
+    let { ethereum_starting_point } = game;
+    let { cardano_starting_point } = game;
+    let { dogecoin_starting_point } = game;
+    let points = [bitcoin_starting_point, ethereum_starting_point, cardano_starting_point, dogecoin_starting_point];
+    let coinsData = [];
+
+    for( let i = 0; i < coins.length; i++) {
+      let data =  await app.db(coins[i])
+        .where( 'sno', '>=', points[i])
+        .orderBy('sno')
+        .limit(300)
+        .select('*');
+
+      coinsData.push(data);
+    };
+
+    return coinsData;
+  }; 
+
+  return { findAll, findOne, save, update, remove, getCryptoTimeSeries };
 };
