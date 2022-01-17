@@ -11,9 +11,9 @@ module.exports = (app) => {
 
   
   const getCompleteWallet = async (gameUserId, cashBalance) => {
-    let coins = await app.db('game_wallet').where({games_users_id: gameUserId}).select('*');
-    coins[coins.length] = {cashBalance: cashBalance};
-    return coins;
+    let wallet = await app.db('game_wallet').where({games_users_id: gameUserId}).select('*');
+    wallet[wallet.length] = {cashBalance: cashBalance};
+    return wallet;
   };
 
   const save = async (gameWallet) => {
