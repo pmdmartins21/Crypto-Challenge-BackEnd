@@ -12,7 +12,6 @@ const username = `${Date.now()}`;
 const email = `${Date.now()}@gmail.com`;
 
 let user;
-let endDate;
 
 //Apenas o admin pode criar jogos
 beforeAll(async () => {
@@ -20,7 +19,6 @@ beforeAll(async () => {
   user = { ...res[0] };
   user.token = jwt.encode(user, secret);
 });
-
 
 test('Teste #13 - Criar um novo jogo', () => {
   return request(app).post(MAIN_ROUTE)

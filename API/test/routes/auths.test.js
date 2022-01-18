@@ -4,10 +4,6 @@ const app = require('../../src/app');
 const email = `${Date.now()}@ipca.pt`;
 const username = `${Date.now()}`;
 
-// beforeAll(async () => {
-// });
-
-
 test('Teste #11.1 - Receber token ao autenticar', () => {
   return app.services.user.save(
     { firstName: 'Pedro', lastName: 'Auth', username: username, password: '12345', email: email, },

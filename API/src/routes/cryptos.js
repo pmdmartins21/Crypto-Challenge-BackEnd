@@ -3,15 +3,6 @@ const express = require('express');
 module.exports = (app) => {
   const router = express.Router();
 
-  //configurar para só admins
-  // router.param('id', (req, res, next) => {
-  //   app.services.crypto.findOne({ id: req.params.id })
-  //     .then((crypto) => {
-  //       if (crypto.id !== req.crypto.id) throw new ForbiddenError();
-  //       else next();
-  //     }).catch((err) => next(err));
-  // });
-
   router.get('/', (req, res, next) => {
     app.services.crypto.findAll()
       .then((result) => res.status(200).json(result))
@@ -21,7 +12,6 @@ module.exports = (app) => {
   router.get('/:id', (req, res, next) => {
     app.services.crypto.findOne({ id: req.params.id })
       .then((result) => {
-        //if (req.user.isAdmin) return res.status(403).json({ error: 'Não tem acesso ao recurso solicitado' }); só para admins
         return res.status(200).json(result);
       })
       .catch((err) => next(err));
@@ -30,7 +20,6 @@ module.exports = (app) => {
   router.get('/timeSeries/:game_id', (req, res, next) => {
     app.services.crypto.getCryptoTimeSeries(req.params.game_id)
       .then((result) => {
-        //if (req.user.isAdmin) return res.status(403).json({ error: 'Não tem acesso ao recurso solicitado' }); só para admins
         return res.status(200).json(result);
       })
       .catch((err) => next(err));

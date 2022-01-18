@@ -12,12 +12,6 @@ module.exports = (app) => {
       }).catch((err) => next(err));
   });
 
-  // router.get('/', (req, res, next) => {
-  //   app.services.game.findAll()
-  //     .then((result) => res.status(200).json(result))
-  //     .catch((err) => next(err));
-  // });
-
   router.post('/:game_id/:user_id', async (req, res, next) => {
     await app.services.gameUser.save({ game_id: req.params.game_id, user_id: req.params.user_id })
     .then((result) => {
@@ -25,21 +19,6 @@ module.exports = (app) => {
     })
       .catch((err) => next(err));
       });
-
-  // router.get('/:id', (req, res, next) => {
-  //   app.services.game.findOne({ id: req.params.id })
-  //     .then((result) => {
-  //      // if (result.id !== req.user.id) return res.status(403).json({ error: 'Não tem acesso ao recurso solicitado' });
-  //       return res.status(200).json(result);
-  //     })
-  //     .catch((err) => next(err));
-  // });
-
-  // router.delete('/:id', (req, res, next) => {
-  //   app.services.game.remove(req.params.id)
-  //     .then(() => res.status(204).send())
-  //     .catch((err) => next(err));
-  // });
 
   router.put('/:id', (req, res, next) => {
     app.services.gameUser.update(req.params.id, req.body)
