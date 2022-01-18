@@ -4,3 +4,4 @@ node_modules/
 web_modules/
 jspm_packages/
 bower_components/
+coverage/
