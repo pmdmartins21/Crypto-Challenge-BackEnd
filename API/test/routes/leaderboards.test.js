@@ -5,13 +5,10 @@ moment().format();
 
 const app = require('../../src/app');
 
-const email = `${Date.now()}@ipca.pt`;
-const username = `${Date.now()}`;
 const randomNum = `${Date.now()}`;
 const startDate = new Date();
 const secret = 'CdTp!DWM@202122';
 const MAIN_ROUTE = '/v1/leaderboards';
-const crypto = `${Date.now()}`
 
 let userA;
 let userB;

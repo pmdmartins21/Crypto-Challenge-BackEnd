@@ -16,7 +16,6 @@ let testGame;
 let user;
 let testCrypto;
 let testGameUser;
-let testGameWallet;
 //só o proprio user pode ver items da carteira com o seu id
 
 beforeAll(async () => {
@@ -29,9 +28,6 @@ beforeAll(async () => {
   testGameUser = { ...res3 };
   const res4 = await app.services.crypto.save({ name: crypto });
   testCrypto = { ...res4[0] };
-
-  // const res5 = await app.services.gameWallet.save({ games_users_id: testGameUser.id, crypto_id: testCrypto.id, amount:5 });
-  // testGameWallet = { ...res5[0] };
 });
 
 test('Test #17.1 - Obter a gameWallet de um utilizador', () => {
@@ -58,28 +54,3 @@ test('Test #17.2 - Obter as coins de outros utilizadores', async() => {
       expect(res.body.error).toBe('Não tem acesso ao recurso solicitado');
     });
 });
-
-// test('Teste #17.3 - Tentar um transaçao de venda sem possuir a cripto em carteira, ou em quantidade suficiente',  () => {
-//   return app.db('gameWallet').insert(
-//     { games_users_id: testGameAUserA, crypto_id: testCrypto.id, amount: 1 }, ['id'],
-//   ).then((gamewallet) => request(app).put(`${MAIN_ROUTE}/${gamewallet[0].id}`)
-//     .set('authorization', `bearer ${userA.token}`)
-//     .send({ amount: -5 })
-//     .then((res) => {
-//       expect(res.status).toBe(200);
-//       expect(res.body.desc).toBe('Trans Updated');
-//     }));
-  
-//   const res = await app.services.gameWallet.save({ games_users_id: testGameAUserA, crypto_id: testCrypto.id, amount: 1});
-//   testGameAUserC = { ...res3[0] };
-
-//   return request(app).put(MAIN_ROUTE)
-//   .set('authorization', `bearer ${userC.token}`)
-//   .send({
-//     games_users_id: testGameAUserA, crypto_id: testCrypto.id, amount: 1 
-//   })
-//   .then((res) => {
-//     expect(res.status).toBe(401);
-//     expect(res.body.error).toBe('Não tem saldo suficiente para a transação');
-//   });
-// });

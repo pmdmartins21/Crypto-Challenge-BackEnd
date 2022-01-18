@@ -4,14 +4,6 @@ const ForbiddenError = require('../errors/forbiddenError');
 module.exports = (app) => {
   const router = express.Router();
 
-  // router.param('id', (req, res, next) => {
-  //   app.services.game.findOne({ id: req.params.id })
-  //     .then((game) => {
-  //       if (user.id !== req.user.id) throw new ForbiddenError();
-  //       else next();
-  //     }).catch((err) => next(err));
-  // });
-
   router.get('/', (req, res, next) => {
     app.services.game.findAll()
       .then((result) => res.status(200).json(result))
@@ -30,7 +22,6 @@ module.exports = (app) => {
   router.get('/:id', (req, res, next) => {
     app.services.game.findOne({ id: req.params.id })
       .then((result) => {
-       // if (result.id !== req.user.id) return res.status(403).json({ error: 'Não tem acesso ao recurso solicitado' });
         return res.status(200).json(result);
       })
       .catch((err) => next(err));

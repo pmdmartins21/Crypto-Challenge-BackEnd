@@ -3,12 +3,9 @@ const jwt = require('jwt-simple');
 const moment = require('moment');
 moment().format();
 
-
 const app = require('../../src/app');
-
 const secret = 'CdTp!DWM@202122';
 const MAIN_ROUTE = '/v1/cryptos';
-
 const username = `${Date.now()}`;
 const email = `${Date.now()}@gmail.com`;
 const cryptoToUpdate = `${Date.now()}`;
@@ -16,8 +13,6 @@ const startDate = new Date();
 
 let user;
 let testGame;
-
-
 
 beforeAll(async () => {
   const res = await app.services.user.save({ firstName: 'Pedro', lastName: 'Martins', username: username, password: '12345', email: email });

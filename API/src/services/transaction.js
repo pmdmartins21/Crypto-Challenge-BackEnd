@@ -1,5 +1,4 @@
 const ValidationError = require('../errors/validationError');
-const Transaction = require('../../src/models/transaction');
 
 module.exports = (app) => {
 

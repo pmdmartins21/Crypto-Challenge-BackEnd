@@ -2,12 +2,9 @@ const request = require('supertest');
 const jwt = require('jwt-simple');
 const moment = require('moment');
 moment().format();
-const Transaction = require('../../src/models/transaction');
 
 const app = require('../../src/app');
 
-const email = `${Date.now()}@ipca.pt`;
-const username = `${Date.now()}`;
 const randomNum = `${Date.now()}`;
 const startDate = new Date();
 const secret = 'CdTp!DWM@202122';
