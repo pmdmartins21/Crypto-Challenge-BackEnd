@@ -26,8 +26,6 @@ let testCrypto;
 
 
 beforeAll(async () => {
-  await app.db.seed.run();
-
   const users = await app.db('users').insert([
     { firstName: 'Pedro', lastName: 'Martins', username: `user1${randomNum}`, email: `user1${randomNum}@ipca.pt`, password: '12345' }, 
     { firstName: 'Telmo', lastName: 'Paiva', username: `user2${randomNum}`, email: `user2${randomNum}@ipca.pt`, password: '12345' },
@@ -111,7 +109,7 @@ test('Teste #19.4 - Listar todas as transaçoes de utilizador', () => {
       .send(
         { games_users_id: testGameBUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100 }
       )
-      .then(() => request(app).get(`${MAIN_ROUTE}/${userA.id}`)
+      .then(() => request(app).get(`${MAIN_ROUTE}/all/${userA.id}`)
       .set('authorization', `bearer ${userA.token}`)
       .then((res) => {
         expect(res.status).toBe(200);
@@ -172,13 +170,13 @@ test('Teste #20.3 -Transaçoes de venda devem ser negativas', () => {
     });
 });
 
-//validar todos os campos
+// validar todos os campos
 describe(' 20.4 Validação de criar uma transação', () => {
   const testTemplate = (newData, errorMessage) => {
     return request(app).post(MAIN_ROUTE)
       .set('authorization', `bearer ${userA.token}`)
       .send({
-        games_users_id: testGameAUserC.id, crypto_id: testCrypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100, ...newData,
+        games_users_id: testGameAUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100, ...newData,
       })
       .then((res) => {
         expect(res.status).toBe(400);
@@ -186,7 +184,7 @@ describe(' 20.4 Validação de criar uma transação', () => {
       });
   };
 
-  test('Test 20.4.1 - Sem Game_User_ID', () => testTemplate({ games_users_id: null }, 'O GAME_USER é um atributo obrigatório'));
+  test('Test 20.4.1 - Sem Game_User_ID', () => testTemplate({ games_users_id: null }, 'O GAME_USER_ID é um atributo obrigatório'));
   test('Test 20.4.2 - Sem Crypto_ID', () => testTemplate({ crypto_id: null }, 'O Crypto_ID é um atributo obrigatório'));
   test('Test 20.4.3 - Sem Data', () => testTemplate({ date: null }, 'A DATA é um atributo obrigatório'));
   test('Test 20.4.4 - Sem Tipo', () => testTemplate({ type: null }, 'O TIPO é um atributo obrigatório'));

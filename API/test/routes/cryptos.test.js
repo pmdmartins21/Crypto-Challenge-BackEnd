@@ -18,7 +18,6 @@ let user;
 let testGame;
 
 
-//Apenas aceitar adicionar crypto's pelo admin
 
 beforeAll(async () => {
   const res = await app.services.user.save({ firstName: 'Pedro', lastName: 'Martins', username: username, password: '12345', email: email });

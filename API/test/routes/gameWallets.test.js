@@ -20,7 +20,6 @@ let testGameWallet;
 //só o proprio user pode ver items da carteira com o seu id
 
 beforeAll(async () => {
-  await app.db.seed.run();
   const res = await app.services.user.save({ firstName: 'Pedro', lastName: 'Martins321', username: username, email:email, password: '12345' });
   user = { ...res[0] };
   user.token = jwt.encode(user, secret);
@@ -41,9 +40,8 @@ test('Test #17.1 - Obter a gameWallet de um utilizador', () => {
     .then((res) => {
       expect(res.status).toBe(200);
       expect(res.body).not.toHaveLength(0);
-      expect(res.body[0]).toHaveProperty('crypto_id');
+      expect(res.body[0]).toHaveProperty('id');
       expect(res.body[0].amount).toBe('0.00');
-      expect(res.body[0].games_users_id).toBe(testGameUser.id);
       expect(res.body[res.body.length - 1]).toHaveProperty('cashBalance');
     });
 });
@@ -85,7 +83,3 @@ test('Test #17.2 - Obter as coins de outros utilizadores', async() => {
 //     expect(res.body.error).toBe('Não tem saldo suficiente para a transação');
 //   });
 // });
-
-//test('Test #5 - Efetuar uma compra de crypto', () => {console.log(testGameWallet)});
-
-// test('Test #5 - Efetuar uma venda de crypto', () => {});

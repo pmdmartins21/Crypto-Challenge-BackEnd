@@ -21,6 +21,7 @@ beforeAll(async () => {
   user.token = jwt.encode(user, secret);
 });
 
+
 test('Teste #13 - Criar um novo jogo', () => {
   return request(app).post(MAIN_ROUTE)
     .set('authorization', `bearer ${user.token}`)

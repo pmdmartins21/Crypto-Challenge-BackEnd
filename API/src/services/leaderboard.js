@@ -4,7 +4,9 @@ module.exports = (app) => {
   const find = (filter = {}) => {
     return app.db('games_users')
     .innerJoin('users', 'games_users.user_id', 'users.id')
-    .where(filter).orderBy('cashBalance', 'desc').select('games_users.game_id', 'users.firstName', 'users.lastName', 'games_users.cashBalance');
+    .where(filter)
+    .orderBy('cashBalance', 'desc')
+    .select('games_users.game_id', 'users.firstName', 'users.lastName', 'games_users.cashBalance');
   };
 
   // const findOne = (filter = {}) => {

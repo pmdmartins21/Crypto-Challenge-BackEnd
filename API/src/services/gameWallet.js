@@ -11,7 +11,11 @@ module.exports = (app) => {
 
   
   const getCompleteWallet = async (gameUserId, cashBalance) => {
-    let wallet = await app.db('game_wallet').where({games_users_id: gameUserId}).select('*');
+    let wallet = await app.db('game_wallet')
+    .innerJoin('cryptos', 'cryptos.id', 'game_wallet.crypto_id')
+    .where({games_users_id: gameUserId})
+    .select('cryptos.id', 'cryptos.name', 'game_wallet.amount');
+
     wallet[wallet.length] = {cashBalance: cashBalance};
     return wallet;
   };

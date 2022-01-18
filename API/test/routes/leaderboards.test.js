@@ -23,7 +23,6 @@ let testGameAUserC;
 
 
 beforeAll(async () => {
-
   const users = await app.db('users').insert([
     { firstName: 'Pedro', lastName: 'Martins', username: `user1${randomNum}`, email: `user1${randomNum}@ipca.pt`, password: '12345' }, 
     { firstName: 'Telmo', lastName: 'Paiva', username: `user2${randomNum}`, email: `user2${randomNum}@ipca.pt`, password: '12345' },
