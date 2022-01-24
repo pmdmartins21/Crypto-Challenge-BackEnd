@@ -27,11 +27,11 @@ module.exports = (app) => {
       .catch((err) => next(err));
   });
 
-  router.delete('/:id', (req, res, next) => {
-    app.services.game.remove(req.params.id)
-      .then(() => res.status(204).send())
-      .catch((err) => next(err));
-  });
+  // router.delete('/:id', (req, res, next) => {
+  //   app.services.game.remove(req.params.id)
+  //     .then(() => res.status(204).send())
+  //     .catch((err) => next(err));
+  // });
 
   router.put('/:id', (req, res, next) => {
     app.services.game.update(req.params.id, req.body)

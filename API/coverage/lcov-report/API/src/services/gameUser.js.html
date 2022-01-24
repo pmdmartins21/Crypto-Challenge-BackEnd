@@ -92,13 +92,10 @@
 67
 68
 69
-70
-71
-72
-73
-74</td><td class="line-coverage quiet"><span class="cline-any cline-yes">9x</span>
+70</td><td class="line-coverage quiet"><span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">9x</span>
@@ -110,14 +107,19 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
-<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">20x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-yes">8x</span>
@@ -128,7 +130,7 @@
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
-<span class="cline-any cline-yes">90x</span>
+<span class="cline-any cline-yes">32x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">8x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -152,19 +154,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">9x</span>
@@ -173,9 +165,10 @@
 const { user } = require('pg/lib/defaults');
 const ValidationError = require('../errors/validationError');
 &nbsp;
+&nbsp;
 module.exports = (app) =&gt; {
   const findAll = <span class="fstat-no" title="function not covered" >(f</span>ilter = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> =&gt; {
-<span class="cstat-no" title="statement not covered" >    return app.db('games_users').where(filter).select('*');</span>
+<span class="cstat-no" title="statement not covered" >    return app.db('games_users').where(filter).select('*'); </span>//testar
   };
 &nbsp;
   const findAllGameUsersID = (filter = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> =&gt; {
@@ -183,14 +176,19 @@ module.exports = (app) =&gt; {
   };
 &nbsp;
   const findOne = (filter = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> =&gt; {
+    let test =  isNaN(Number(filter.game_id));
+    <span class="missing-if-branch" title="if path not taken" >I</span>if(typeof(filter) !== 'object'  )  <span class="cstat-no" title="statement not covered" >throw new ValidationError('O jogo indicado não é válido');</span>
+    if(filter.game_id) {
+      if( isNaN(Number(filter.game_id))) throw new ValidationError('O jogo indicado não é válido');
+    }
     return app.db('games_users').where(filter).first();
   };
 &nbsp;
   const save = async (newGameInfo) =&gt; {
     let result;
 &nbsp;
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (!newGameInfo.user_id) <span class="cstat-no" title="statement not covered" >throw new ValidationError('USER_ID é um atributo obrigatório');</span>
-    <span class="missing-if-branch" title="if path not taken" >I</span>if (!newGameInfo.game_id) <span class="cstat-no" title="statement not covered" >throw new ValidationError('GAME_ID é um atributo obrigatório');</span>
+    if (!newGameInfo.user_id) throw new ValidationError('USER_ID é um atributo obrigatório');
+    if (!newGameInfo.game_id) throw new ValidationError('GAME_ID é um atributo obrigatório');
 &nbsp;
     const game_user_Db = await findOne(newGameInfo);
     <span class="missing-if-branch" title="if path not taken" >I</span>if (game_user_Db) <span class="cstat-no" title="statement not covered" >throw new ValidationError('O user já está registado neste jogo');</span>
@@ -225,20 +223,10 @@ module.exports = (app) =&gt; {
       .update({cashBalance: userBalance}, '*');
   };
 &nbsp;
-  //com o findOne não deve ser necessário esta parte...
   const checkBalance = async (gameUserId) =&gt; {
     const gameUserDb = await findOne({ id: gameUserId });
     return Number(gameUserDb.cashBalance);
   }
-&nbsp;
-  // const remove = async (id) =&gt; {
-  //   const game = await app.services.game.findOne({ id: id });
-  //   if (!game) throw new ValidationError('O Game não existe na BD');
-&nbsp;
-  //   return app.db('games')
-  //     .where({ id })
-  //     .del();
-  // };
 &nbsp;
   return { findAllGameUsersID, findAll, findOne, update, save };
 };
@@ -248,7 +236,7 @@ module.exports = (app) =&gt; {
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Jan 18 2022 22:03:21 GMT+0000 (Western European Standard Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Mon Jan 24 2022 03:14:06 GMT+0000 (Western European Standard Time)
 </div>
 </div>
 <script src="..\..\..\prettify.js"></script>

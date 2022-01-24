@@ -6,7 +6,7 @@ module.exports = (app) => {
     return app.db('users').where(filter).select(['id', 'firstName', 'lastName','email', 'username' ]);
   };
 
-  const findOne = (filter = {}) => {
+  const findOne = (filter = {}) => { //testar
     return app.db('users').where(filter).first();
   };
 
@@ -35,7 +35,7 @@ module.exports = (app) => {
 
   const remove = async (id) => {
     const user = await app.services.user.findOne({ id: id });
-    if (!user) throw new ValidationError('O User não existe na BD');
+    if (!user) throw new ValidationError('O User não existe na BD'); //testar
 
     return app.db('users')
       .where({ id })
