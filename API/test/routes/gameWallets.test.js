@@ -10,11 +10,9 @@ const email = `${Date.now()}@ipca.pt`;
 const startDate = new Date();
 const secret = 'CdTp!DWM@202122';
 const MAIN_ROUTE = '/v1/gameWallet';
-const crypto = `${Date.now()}`
 
 let testGame;
 let user;
-let testCrypto;
 let testGameUser;
 //só o proprio user pode ver items da carteira com o seu id
 
@@ -26,8 +24,6 @@ beforeAll(async () => {
   testGame = { ...res2[0] };
   const res3 = await app.services.gameUser.save({ user_id: user.id, game_id: testGame.id});
   testGameUser = { ...res3 };
-  const res4 = await app.services.crypto.save({ name: crypto });
-  testCrypto = { ...res4[0] };
 });
 
 test('Test #17.1 - Obter a gameWallet de um utilizador', () => {
@@ -53,4 +49,28 @@ test('Test #17.2 - Obter as coins de outros utilizadores', async() => {
       expect(res.status).toBe(403);
       expect(res.body.error).toBe('Não tem acesso ao recurso solicitado');
     });
+});
+
+test('Test 17.3.1 -Salvar Game_wallet Sem Game_User_ID', () => {
+    return app.services.gameWallet.save({
+      games_users_id: null,
+      crypto_id: 1,
+      amount: 0,
+    })
+    .catch((err) => {
+      expect(err.name).toBe('validationError');
+      expect(err.message).toBe('Game_User_ID é um atributo obrigatório');
+    })
+});
+
+test('Test 17.3.2 -Salvar Game_wallet Sem crypto_id', () => {
+  return app.services.gameWallet.save({
+    games_users_id: testGameUser.id,
+    crypto_id: null,
+    amount: 0,
+  })
+  .catch((err) => {
+    expect(err.name).toBe('validationError');
+    expect(err.message).toBe('Crypto_ID é um atributo obrigatório');
+  })
 });

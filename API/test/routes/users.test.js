@@ -11,13 +11,9 @@ const MAIN_ROUTE = '/v1/users';
 let user;
 let userToDelete;
 let userToUpdate;
-let userAdmin = {
-  firstName: 'Pedro',
-  lastName: 'Martins',
-  username: 'admin',
-  password: 'admin',
-  email: 'admin@cryptochallenge.com'
-};
+let userInvalidId = {
+  id: 10000000
+} ;
 
 beforeAll(async () => {
   const res = await app.services.user.save({ firstName: 'Pedro', lastName: 'Martins', username: username, password: '12345', email: email });
@@ -26,7 +22,7 @@ beforeAll(async () => {
   const res2 = await app.services.user.save({ firstName: 'User', lastName: 'ToDelete', username: `${Date.now()}`, password: '12345', email: `${Date.now()}@gmail.com` });
   userToDelete = { ...res2[0] };
   userToDelete.token = jwt.encode(userToDelete, secret);
-  const res3 = await app.services.user.save({ firstName: 'User', lastName: 'ToUpdate', username: `${Date.now()}`, password: '12345', email: `${Date.now()}@gmail.com` });
+  const res3 = await app.services.user.save({ firstName: 'User', lastName: 'ToUpdate', username: `${Date.now()}1`, password: '12345', email: `${Date.now()}1@gmail.com` });
   userToUpdate = { ...res3[0] };
   userToUpdate.token = jwt.encode(userToUpdate, secret);
 });
@@ -41,6 +37,14 @@ test('Test #1 - Listar os utilizadores', () => {
     });
 });
 
+test('Test #1.1 - Listar um utilizador que não existe', () => {
+  return request(app).get(`${MAIN_ROUTE}/${userInvalidId.id}`)
+    .set('authorization', `bearer ${user.token}`)
+    .then((res) => {
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('O User não existe na BD');
+    });
+});
 
 test('Test #2 - Inserir utilizadores', () => {
   return request(app).post(MAIN_ROUTE)
@@ -123,13 +127,22 @@ test('Test #2.4 - Inserir email Duplicado', () => {
 });
 
 
-test('Teste #3 - Listar um user por id', () => {
+test('Teste #3.1 - Listar um user por id', () => {
   return request(app).get(`${MAIN_ROUTE}/${user.id}`)
     .set('authorization', `bearer ${user.token}`)
     .then((res) => {
       expect(res.status).toBe(200);
       expect(res.body.firstName).toBe(user.firstName);
       expect(res.body).not.toBe(user.password);
+    });
+});
+
+test('Teste #3.2 - Listar um user por id diferente do user no request', () => {
+  return request(app).get(`${MAIN_ROUTE}/${user.id}`)
+    .set('authorization', `bearer ${userToDelete.token}`)
+    .then((res) => {
+      expect(res.status).toBe(403);
+      expect(res.body.error).toBe('Não tem acesso ao recurso solicitado');
     });
 });
 
@@ -151,6 +164,3 @@ test('Test #5 - Alterar info de utilizador por Id', async () => {
       expect(res.body.firstName).toBe('NewName');
     });
 });
-
-
-

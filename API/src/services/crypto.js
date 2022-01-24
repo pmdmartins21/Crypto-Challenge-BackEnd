@@ -11,12 +11,12 @@ module.exports = (app) => {
     return app.db('cryptos').where(filter).select('*');
   };
 
-  const findOne = (filter = {}) => {
+  const findOne = (filter = {}) => { //testar
     return app.db('cryptos').where(filter).first();
   };
 
   const save = async (crypto) => {
-    if (!crypto.name) throw new ValidationError('Name é um atributo obrigatório');
+    if (!crypto.name) throw new ValidationError('Name é um atributo obrigatório'); //testar
 
     const cryptoDb = await findOne({ name: crypto.name });
     if (cryptoDb) throw new ValidationError('Name duplicado na Bd');
@@ -32,7 +32,7 @@ module.exports = (app) => {
 
   const remove = async (id) => {
     const crypto = await app.services.crypto.findOne({ id: id });
-    if (!crypto) throw new ValidationError('A Crypto não existe na BD');
+    if (!crypto) throw new ValidationError('A Crypto não existe na BD'); //testar
 
     return app.db('cryptos')
       .where({ id })
@@ -41,7 +41,7 @@ module.exports = (app) => {
 
   const getCryptoTimeSeries = async (game_id) => {
     const game = await app.services.game.findOne({ id: parseInt(game_id) });
-    if (!game) throw new ValidationError('O jogo não existe na BD');
+    if (!game) throw new ValidationError('O jogo não existe na BD'); //testar
 
     //loop para ir buscar a timeserie de cada uma das 4 moedas(BTC,ETH,ADA,DOGE)
     let { bitcoin_starting_point } = game;

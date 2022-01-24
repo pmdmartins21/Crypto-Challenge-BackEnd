@@ -9,7 +9,7 @@ const randomNum = `${Date.now()}`;
 const startDate = new Date();
 const secret = 'CdTp!DWM@202122';
 const MAIN_ROUTE = '/v1/transactions';
-const crypto = `${Date.now()}`
+const crypto = { id: 1, name: 'Bitcoin'};
 
 let userA;
 let userB;
@@ -19,7 +19,7 @@ let testGameB;
 let testGameAUserA;
 let testGameAUserB;
 let testGameBUserA;
-let testCrypto;
+
 
 
 beforeAll(async () => {
@@ -47,18 +47,13 @@ beforeAll(async () => {
   testGameB = { ...res4[0] };
   const res5 = await app.services.gameUser.save({ user_id: userA.id, game_id: testGameB.id});
   testGameBUserA = { ...res5 };
-  const res7 = await app.services.crypto.save({ name: crypto });
-  testCrypto = { ...res7[0] };
 });
 
 test('Teste #19.1 -Inserir uma transação de compra', () => {
-  const transaction = 
-    { games_users_id: testGameAUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100 };
+    const transaction = 
+    { games_users_id: testGameAUserA.id, crypto_id: crypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100 }; 
     
-    return app.db('game_wallet').insert({
-      games_users_id: transaction.games_users_id, crypto_id: transaction.crypto_id, amount: 0 
-    })
-      .then(() =>  request(app).post(`${MAIN_ROUTE}`)
+    return request(app).post(`${MAIN_ROUTE}`)
       .set('authorization', `bearer ${userA.token}`)
       .send(transaction)
       .then((res) => {
@@ -67,16 +62,16 @@ test('Teste #19.1 -Inserir uma transação de compra', () => {
 
         expect(res.body.type).toBe('B');
         expect(res.body.amount).toBe('5.00');
-      }));
+      });
 });
 
 test('Teste #19.2 -Inserir uma transação de venda', () => {
-  const transaction = 
-    { games_users_id: testGameAUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'S', amount: -2, crypto_value: 100 };
+  const transaction2 = 
+    { games_users_id: testGameAUserA.id, crypto_id: crypto.id, date: new Date(),  type: 'S', amount: -2, crypto_value: 100 };
     
     return request(app).post(`${MAIN_ROUTE}`)
       .set('authorization', `bearer ${userA.token}`)
-      .send(transaction)
+      .send(transaction2)
       .then((res) => {
         expect(res.status).toBe(201);
         expect(res.body).toHaveProperty('crypto_value');
@@ -85,26 +80,40 @@ test('Teste #19.2 -Inserir uma transação de venda', () => {
       });
 });
 
-test('Teste #19.3 -Tentar uma compra sem saldo suficiente', () => {
-  const transaction = 
-    { games_users_id: testGameAUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'B', amount: 5000, crypto_value: 100 };
+test('Teste #19.3.1 -Tentar uma compra sem saldo suficiente', () => {
+  const transaction3 = 
+    { games_users_id: testGameAUserA.id, crypto_id: crypto.id, date: new Date(),  type: 'B', amount: 5000, crypto_value: 100 };
     
     return request(app).post(`${MAIN_ROUTE}`)
       .set('authorization', `bearer ${userA.token}`)
-      .send(transaction)
+      .send(transaction3)
       .then((res) => {
         expect(res.status).toBe(400);
         expect(res.body.error).toBe('Não tem saldo suficiente para a transação');
       });
 });
-test('Teste #19.4 - Listar todas as transaçoes de utilizador', () => {
+
+test('Teste #19.3.2 -Tentar uma venda sem cryptos suficientes', () => {
+  const transaction4 = 
+    { games_users_id: testGameAUserA.id, crypto_id: crypto.id, date: new Date(),  type: 'S', amount: -5000, crypto_value: 100 };
+    
+    return request(app).post(`${MAIN_ROUTE}`)
+      .set('authorization', `bearer ${userA.token}`)
+      .send(transaction4)
+      .then((res) => {
+        expect(res.status).toBe(400);
+        expect(res.body.error).toBe('Não tem cryptos suficientes para a transação');
+      });
+});
+
+test('Teste #19.4 - Listar todas as transaçoes de utilizador', () => { //TODO confirmar se é preciso o insert
   return app.db('game_wallet').insert({
-    games_users_id: testGameBUserA.id, crypto_id: testCrypto.id, amount: 0 
+    games_users_id: testGameBUserA.id, crypto_id: crypto.id, amount: 0 
   }).then(() => 
     request(app).post(`${MAIN_ROUTE}`)
       .set('authorization', `bearer ${userA.token}`)
       .send(
-        { games_users_id: testGameBUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100 }
+        { games_users_id: testGameBUserA.id, crypto_id: crypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100 }
       )
       .then(() => request(app).get(`${MAIN_ROUTE}/all/${userA.id}`)
       .set('authorization', `bearer ${userA.token}`)
@@ -116,22 +125,20 @@ test('Teste #19.4 - Listar todas as transaçoes de utilizador', () => {
       }))); 
 });
 
-// test('Teste #19.5 - Aceder a transaçoes de outro utilizador', () => {
-//   return app.db('transactions').insert(
-//     { games_users_id: testGameAUserB.id, crypto_id: testCrypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100 }, ['id'],
-//   ).then((trans) => request(app).get(`${MAIN_ROUTE}/${trans[0].id}`)
-//     .set('authorization', `bearer ${userA.token}`)
-//     .then((res) => {
-//       expect(res.status).toBe(403);
-//       expect(res.body.error).toBe('Não tem acesso ao recurso solicitado');
-//     }));
-// });
+test('Teste #19.5 - Aceder a transaçoes de outro utilizador', () => {
+  return request(app).get(`${MAIN_ROUTE}/all/${userA.id}`)
+    .set('authorization', `bearer ${userB.token}`)
+    .then((res) => {
+      expect(res.status).toBe(403);
+      expect(res.body.error).toBe('Não tem acesso ao recurso solicitado');
+    })
+});
 
 test('Teste #20.1 - Inserir Transação de um utilizador', () => {
   return request(app).post(MAIN_ROUTE)
     .set('authorization', `bearer ${userA.token}`)
     .send({
-      games_users_id: testGameAUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100 
+      games_users_id: testGameAUserA.id, crypto_id: crypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100 
     })
     .then((res) => {
       expect(res.status).toBe(201);
@@ -146,7 +153,7 @@ test('Teste #20.2 - Transaçoes de compra devem ser positivas', () => {
   return request(app).post(MAIN_ROUTE)
   .set('authorization', `bearer ${userA.token}`)
   .send({
-    games_users_id: testGameAUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100
+    games_users_id: testGameAUserA.id, crypto_id: crypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100
   })
   .then((res) => {
     expect(res.status).toBe(201);
@@ -158,7 +165,7 @@ test('Teste #20.3 -Transaçoes de venda devem ser negativas', () => {
   return request(app).post(MAIN_ROUTE)
     .set('authorization', `bearer ${userA.token}`)
     .send({
-      games_users_id: testGameAUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'S', amount: -2, crypto_value: 100
+      games_users_id: testGameAUserA.id, crypto_id: crypto.id, date: new Date(),  type: 'S', amount: -2, crypto_value: 100
     })
     .then((res) => {
       expect(res.status).toBe(201);
@@ -173,7 +180,7 @@ describe(' 20.4 Validação de criar uma transação', () => {
     return request(app).post(MAIN_ROUTE)
       .set('authorization', `bearer ${userA.token}`)
       .send({
-        games_users_id: testGameAUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100, ...newData,
+        games_users_id: testGameAUserA.id, crypto_id: crypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100, ...newData,
       })
       .then((res) => {
         expect(res.status).toBe(400);
@@ -192,7 +199,7 @@ describe(' 20.4 Validação de criar uma transação', () => {
 
 test('Teste #21 - Listar uma transaçao', () => {
   return app.db('transactions').insert(
-    { games_users_id: testGameAUserA.id, crypto_id: testCrypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100 }, ['id'],
+    { games_users_id: testGameAUserA.id, crypto_id: crypto.id, date: new Date(),  type: 'B', amount: 5, crypto_value: 100 }, ['id'],
   ).then((trans) => request(app).get(`${MAIN_ROUTE}/${trans[0].id}`)
     .set('authorization', `bearer ${userA.token}`)
     .then((res) => {

@@ -1,14 +1,9 @@
 const ValidationError = require('../errors/validationError');
 
 module.exports = (app) => {
-  const findAll = (filter = {}) => {
-    return app.db('game_wallet').where(filter).select('*');
-  };
-
   const findOne = (filter = {}) => {
     return app.db('game_wallet').where(filter).first();
   };
-
   
   const getCompleteWallet = async (gameUserId, cashBalance) => {
     let wallet = await app.db('game_wallet')
@@ -23,9 +18,6 @@ module.exports = (app) => {
   const save = async (gameWallet) => {
     if (!gameWallet.games_users_id) throw new ValidationError('Game_User_ID é um atributo obrigatório');
     if (!gameWallet.crypto_id) throw new ValidationError('Crypto_ID é um atributo obrigatório');
-
-    // const gameDb = await findOne({ name: crypto.name });
-    // if (cryptoDb) throw new ValidationError('Name duplicado na Bd');
 
     return app.db('game_wallet').insert(gameWallet, ['*']);
   };
@@ -49,21 +41,5 @@ module.exports = (app) => {
       .update({ amount: updatedUserCryptoWallet.amount }, '*');
   };
 
-  // const checkTotalCrypto = async (gameUserId, cryptoID) => {
-  //   const totalCrypto = await findOne({ games_users_id: gameUserId, crypto_id: cryptoID });
-  //   totalCrypto.amount = Number(totalCrypto.amount);
-  //   return 
-  // };
-
-
-  // const remove = async (id) => {
-  //   const game = await app.services.game.findOne({ id: id });
-  //   if (!game) throw new ValidationError('O Game não existe na BD');
-
-  //   return app.db('games')
-  //     .where({ id })
-  //     .del();
-  // };
-
-  return { findAll, findOne, save, update, getCompleteWallet };
+  return { findOne, save, update, getCompleteWallet };
 };

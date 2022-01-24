@@ -15,8 +15,8 @@ module.exports = (app) => {
     app.services.user.findOne({ id: payload.id })
       .then((user) => {
         if (user) done(null, { ...payload });
-        else done(null, false);
-      }).catch((err) => done(err, false));
+        else done(null, false); // testar
+      }).catch((err) => done(err, false)); // testar
   });
 
   passport.use(strategy);

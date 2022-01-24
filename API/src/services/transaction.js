@@ -32,15 +32,24 @@ module.exports = (app) => {
     if (!trans.crypto_value) throw new ValidationError('O VALOR DA CRYPTO é um atributo obrigatório');
     if (!(trans.type === 'B' || trans.type === 'S')) throw new ValidationError('O TIPO tem um valor inválido');
 
-    //update game user
+    //O tipo de transaçao influencia a ordem de update - Compra => primeiro gameUser | Venda => 1o GameWallet
+    if(trans.type === 'B') {
+      //update game user
     await app.services.gameUser.update(trans);
     //update game wallet
     await app.services.gameWallet.update(trans);
+    }
+    else {
+      //update game wallet
+    await app.services.gameWallet.update(trans);
+     //update game user
+     await app.services.gameUser.update(trans);
+    }
 
     const newTrans = { ...trans };
-    if ((trans.type === 'B' && trans.ammount < 0)
-      || (trans.type === 'S' && trans.ammount > 0)) {
-      newTrans.amount *= -1;
+    if ((trans.type === 'B' && trans.amount < 0)
+      || (trans.type === 'S' && trans.amount > 0)) {
+      newTrans.amount *= -1; // testar
     }
 
     return app.db('transactions')
@@ -48,18 +57,18 @@ module.exports = (app) => {
   };
 
   const update = (id, trans) => {
-    return app.db('transactions')
+    return app.db('transactions') ///testar
       .where({ id })
       .update(trans, '*');
   };
 
-  const remove = (id) => {
-    return app.db('transactions')
-      .where({ id })
-      .del();
-  };
+  // const remove = (id) => {
+  //   return app.db('transactions') //testar
+  //     .where({ id })
+  //     .del();
+  // };
 
   return {
-    save, update, remove, findAll, findOne
+    save, update, findAll, findOne
   };
 };

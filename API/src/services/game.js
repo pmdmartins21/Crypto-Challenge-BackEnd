@@ -7,10 +7,11 @@ const dogecoinDateEntries = 2760;
 
 module.exports = (app) => {
   const findAll = (filter = {}) => {
-    return app.db('games').where(filter).select('*');
+    return app.db('games').where(filter).select('*'); //testar
   };
 
   const findOne = (filter = {}) => {
+    if(typeof(filter) !== 'object')  throw new ValidationError('O jogo indicado não é válido');
     return app.db('games').where(filter).first();
   };
 
@@ -38,16 +39,16 @@ module.exports = (app) => {
       .update(game, '*');
   };
 
-  const remove = async (id) => {
-    const game = await app.services.game.findOne({ id: id });
-    if (!game) throw new ValidationError('O Game não existe na BD');
+  // const remove = async (id) => {
+  //   const game = await app.services.game.findOne({ id: id }); //testar
+  //   if (!game) throw new ValidationError('O Game não existe na BD'); //testar
 
-    return app.db('games')
-      .where({ id })
-      .del();
-  };
+  //   return app.db('games')
+  //     .where({ id })
+  //     .del();
+  // };
 
-  return { findAll, findOne, save, update, remove };
+  return { findAll, findOne, save, update };
 };
 
 //TODO terminar jogo => vender cryptos ao preço do ultimo valor na timeseries do jogo.

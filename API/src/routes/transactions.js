@@ -4,7 +4,7 @@ const ForbiddenError = require('../errors/forbiddenError');
 module.exports = (app) => {
   const router = express.Router();
 
-  router.param('/all/:user_id', (req, res, next) => {
+  router.param('user_id', (req, res, next) => { //testar
     app.services.user.findOne({ id: req.params.user_id })
       .then((user) => {
         if (user.id !== req.user.id) throw new ForbiddenError();

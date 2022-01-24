@@ -2,9 +2,10 @@ const { use } = require('passport');
 const { user } = require('pg/lib/defaults');
 const ValidationError = require('../errors/validationError');
 
+
 module.exports = (app) => {
   const findAll = (filter = {}) => {
-    return app.db('games_users').where(filter).select('*');
+    return app.db('games_users').where(filter).select('*'); //testar
   };
 
   const findAllGameUsersID = (filter = {}) => {
@@ -12,6 +13,11 @@ module.exports = (app) => {
   };
 
   const findOne = (filter = {}) => {
+    let test =  isNaN(Number(filter.game_id));
+    if(typeof(filter) !== 'object'  )  throw new ValidationError('O jogo indicado não é válido');
+    if(filter.game_id) {
+      if( isNaN(Number(filter.game_id))) throw new ValidationError('O jogo indicado não é válido');
+    }
     return app.db('games_users').where(filter).first();
   };
 
@@ -54,20 +60,10 @@ module.exports = (app) => {
       .update({cashBalance: userBalance}, '*');
   };
 
-  //com o findOne não deve ser necessário esta parte...
   const checkBalance = async (gameUserId) => {
     const gameUserDb = await findOne({ id: gameUserId });
     return Number(gameUserDb.cashBalance);
   }
-
-  // const remove = async (id) => {
-  //   const game = await app.services.game.findOne({ id: id });
-  //   if (!game) throw new ValidationError('O Game não existe na BD');
-
-  //   return app.db('games')
-  //     .where({ id })
-  //     .del();
-  // };
 
   return { findAllGameUsersID, findAll, findOne, update, save };
 };

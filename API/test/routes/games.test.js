@@ -13,7 +13,6 @@ const email = `${Date.now()}@gmail.com`;
 
 let user;
 
-//Apenas o admin pode criar jogos
 beforeAll(async () => {
   const res = await app.services.user.save({ firstName: 'Pedro', lastName: 'Martins', username: username, password: '12345', email: email });
   user = { ...res[0] };
@@ -40,6 +39,15 @@ test('Teste #14 - Listar um jogo por id', () => {
     .then((res) => {
       expect(res.status).toBe(200);
       expect(new Date(res.body.startDate)).toEqual(startDate);
+    });
+});
+
+test('Teste #14 - Listar todos os jogos', () => {
+  return  request(app).get(`${MAIN_ROUTE}`)
+      .set('authorization', `bearer ${user.token}`)
+    .then((res) => {
+      expect(res.status).toBe(200);
+      expect(res.body.length).toBeGreaterThan(0);
     });
 });
 

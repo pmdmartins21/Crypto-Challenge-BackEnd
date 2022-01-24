@@ -9,6 +9,8 @@ const randomNum = `${Date.now()}`;
 const startDate = new Date();
 const secret = 'CdTp!DWM@202122';
 const MAIN_ROUTE = '/v1/leaderboards';
+const invalidGame = 'invalid!!'
+const emptyObject= {};
 
 let userA;
 let userB;
@@ -17,6 +19,7 @@ let testGameA;
 let testGameAUserA;
 let testGameAUserB;
 let testGameAUserC;
+
 
 
 beforeAll(async () => {
@@ -45,7 +48,7 @@ beforeAll(async () => {
 });
 
 
-test('Teste #16 - Obter o leaderboard de um determinado jogo', () => {
+test('Teste #16.1 - Obter o leaderboard de um determinado jogo', () => {
   return request(app).get(`${MAIN_ROUTE}/${testGameA.id}`)
     .set('authorization', `bearer ${userA.token}`)
     .then((res) => {
@@ -55,3 +58,24 @@ test('Teste #16 - Obter o leaderboard de um determinado jogo', () => {
       expect(parseFloat(res.body[2].cashBalance)).toBeLessThan(parseFloat(res.body[1].cashBalance));
     });
 });
+
+test('Teste #16.2 - Obter o leaderboard de um jogo com id inválido', () => {
+  return request(app).get(`${MAIN_ROUTE}/${invalidGame}`)
+    .set('authorization', `bearer ${userA.token}`)
+    .then((res) => {
+      expect(res.status).toBe(400);
+      expect(res.body.error).toBe('O jogo indicado não é válido');
+    });
+});
+
+// test('Teste #16.3 - Obter o leaderboard de um jogo sem id', () => {
+//   return app.services.leaderboard.find({}).
+//     then((games) =>  request(app).get(`${MAIN_ROUTE}/${games[0].game_id}`)
+//     .set('authorization', `bearer ${userA.token}`)
+//     .then((res) => {
+//       expect(res.status).toBe(200);
+//       expect(res.body[0].game_id).toBe(games[0].game_id);
+//       expect(res.body[1].cashBalance).toBe('3000.00');
+//       expect(parseFloat(res.body[2].cashBalance)).toBeLessThan(parseFloat(res.body[1].cashBalance));
+//     })) ;
+// });
