@@ -35,15 +35,15 @@ module.exports = (app) => {
     //O tipo de transaçao influencia a ordem de update - Compra => primeiro gameUser | Venda => 1o GameWallet
     if(trans.type === 'B') {
       //update game user
-    await app.services.gameUser.update(trans);
-    //update game wallet
-    await app.services.gameWallet.update(trans);
+      await app.services.gameUser.update(trans);
+      //update game wallet
+      await app.services.gameWallet.update(trans);
     }
     else {
       //update game wallet
-    await app.services.gameWallet.update(trans);
-     //update game user
-     await app.services.gameUser.update(trans);
+      await app.services.gameWallet.update(trans);
+      //update game user
+      await app.services.gameUser.update(trans);
     }
 
     const newTrans = { ...trans };
@@ -61,12 +61,6 @@ module.exports = (app) => {
       .where({ id })
       .update(trans, '*');
   };
-
-  // const remove = (id) => {
-  //   return app.db('transactions') //testar
-  //     .where({ id })
-  //     .del();
-  // };
 
   return {
     save, update, findAll, findOne
