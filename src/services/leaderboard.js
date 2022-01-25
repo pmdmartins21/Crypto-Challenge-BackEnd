@@ -1,5 +1,3 @@
-const ValidationError = require('../errors/validationError');
-
 module.exports = (app) => {
   const find = async (filter = {}) => {
     return app.db('games_users')

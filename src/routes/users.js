@@ -2,7 +2,6 @@ const express = require('express');
 const ForbiddenError = require('../errors/forbiddenError');
 const ValidationError = require('../errors/validationError');
 
-
 module.exports = (app) => {
   const router = express.Router();
 

@@ -1,8 +1,6 @@
 const ValidationError = require('../errors/validationError');
 
 module.exports = (app) => {
-
-  
   const findAll = async ( filter = {}) => {
 
     //get all games from this user

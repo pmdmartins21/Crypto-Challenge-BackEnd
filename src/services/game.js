@@ -4,7 +4,6 @@ const ethereumDateEntries = 1615;
 const cardanoDateEntries = 1371;
 const dogecoinDateEntries = 2760;
 
-
 module.exports = (app) => {
   const findAll = (filter = {}) => {
     return app.db('games').where(filter).select('*'); //testar

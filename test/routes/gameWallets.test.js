@@ -2,19 +2,20 @@ const request = require('supertest');
 const jwt = require('jwt-simple');
 const moment = require('moment');
 moment().format();
+const dotenv = require('dotenv');
+dotenv.config();
 
 const app = require('../../src/app');
 
 const username = `${Date.now()}`;
 const email = `${Date.now()}@ipca.pt`;
 const startDate = new Date();
-const secret = 'CdTp!DWM@202122';
+const secret = process.env.jwtSecret;
 const MAIN_ROUTE = '/v1/gameWallet';
 
 let testGame;
 let user;
 let testGameUser;
-//só o proprio user pode ver items da carteira com o seu id
 
 beforeAll(async () => {
   const res = await app.services.user.save({ firstName: 'Pedro', lastName: 'Martins321', username: username, email:email, password: '12345' });

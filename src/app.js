@@ -4,6 +4,8 @@ const consign = require('consign');
 const winston = require('winston');
 const uuid = require('uuidv4');
 const knex = require('knex');
+const dotenv = require('dotenv');
+dotenv.config();
 
 const knexfile = require('../knexfile');
 

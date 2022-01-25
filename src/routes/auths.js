@@ -2,8 +2,10 @@ const express = require('express');
 const jwt = require('jwt-simple');
 const bcrypt = require('bcrypt-nodejs');
 const ValidationError = require('../errors/validationError');
+const dotenv = require('dotenv');
+dotenv.config();
 
-const secret = 'CdTp!DWM@202122';
+const secret = process.env.jwtSecret;
 
 module.exports = (app) => {
   const router = express.Router();

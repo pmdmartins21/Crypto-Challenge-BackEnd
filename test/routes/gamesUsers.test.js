@@ -2,13 +2,15 @@ const request = require('supertest');
 const jwt = require('jwt-simple');
 const moment = require('moment');
 moment().format();
+const dotenv = require('dotenv');
+dotenv.config();
 
 const app = require('../../src/app');
 
 const username = `${Date.now()}`;
 const email = `${Date.now()}@ipca.pt`;
 const startDate = new Date();
-const secret = 'CdTp!DWM@202122';
+const secret = process.env.jwtSecret;
 const MAIN_ROUTE = '/v1/gamesUsers';
 
 let testGame;
