@@ -1,11 +1,14 @@
+const dotenv = require('dotenv');
+dotenv.config();
+
 module.exports = {
   test: {
     client: 'pg',
     connection: {
-      host: 'localhost',
-      user: 'postgres',
-      password: 'ROOT',
-      database: 'cryptochallenge',
+      host: process.env.PG_HOST,
+      user: process.env.PG_USER,
+      password: process.env.PG_PASSWORD,
+      database: process.env.PG_DATABASE_TEST,
     },
     debug: false,
     migrations: {
@@ -23,10 +26,10 @@ module.exports = {
   prod: {
     client: 'pg',
     connection: {
-      host: 'localhost',
-      user: 'postgres',
-      password: 'ROOT',
-      database: 'cryptochallengeprod',
+      host: process.env.PG_HOST,
+      user: process.env.PG_USER,
+      password: process.env.PG_PASSWORD,
+      database: process.env.PG_DATABASE_PROD,
     },
     debug: false,
     migrations: {
