@@ -1,11 +1,12 @@
 const request = require('supertest');
 const jwt = require('jwt-simple');
-
+const dotenv = require('dotenv');
+dotenv.config();
 const app = require('../../src/app');
 
 const username = `${Date.now()}`;
 const email = `${Date.now()}@gmail.com`;
-const secret = 'CdTp!DWM@202122';
+const secret = process.env.jwtSecret;
 const MAIN_ROUTE = '/v1/users';
 
 let user;

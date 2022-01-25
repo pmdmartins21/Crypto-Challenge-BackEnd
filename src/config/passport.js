@@ -1,13 +1,13 @@
 const passport = require('passport');
 const passportJwt = require('passport-jwt');
-
-const secret = 'CdTp!DWM@202122';
+const dotenv = require('dotenv');
+dotenv.config();
 
 const { Strategy, ExtractJwt } = passportJwt;
 
 module.exports = (app) => {
   const params = {
-    secretOrKey: secret,
+    secretOrKey: process.env.jwtSecret,
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
   };
 

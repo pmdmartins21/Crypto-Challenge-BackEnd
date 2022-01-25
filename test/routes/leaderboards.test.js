@@ -2,23 +2,22 @@ const request = require('supertest');
 const jwt = require('jwt-simple');
 const moment = require('moment');
 moment().format();
+const dotenv = require('dotenv');
+dotenv.config();
 
 const app = require('../../src/app');
 
 const randomNum = `${Date.now()}`;
 const startDate = new Date();
-const secret = 'CdTp!DWM@202122';
+const secret = process.env.jwtSecret;
 const MAIN_ROUTE = '/v1/leaderboards';
 const invalidGame = 'invalid!!'
-const emptyObject= {};
 
 let userA;
 let userB;
 let userC;
 let testGameA;
 let testGameAUserA;
-let testGameAUserB;
-let testGameAUserC;
 
 
 
@@ -67,15 +66,3 @@ test('Teste #16.2 - Obter o leaderboard de um jogo com id inválido', () => {
       expect(res.body.error).toBe('O jogo indicado não é válido');
     });
 });
-
-// test('Teste #16.3 - Obter o leaderboard de um jogo sem id', () => {
-//   return app.services.leaderboard.find({}).
-//     then((games) =>  request(app).get(`${MAIN_ROUTE}/${games[0].game_id}`)
-//     .set('authorization', `bearer ${userA.token}`)
-//     .then((res) => {
-//       expect(res.status).toBe(200);
-//       expect(res.body[0].game_id).toBe(games[0].game_id);
-//       expect(res.body[1].cashBalance).toBe('3000.00');
-//       expect(parseFloat(res.body[2].cashBalance)).toBeLessThan(parseFloat(res.body[1].cashBalance));
-//     })) ;
-// });

@@ -1,7 +1,4 @@
-const { use } = require('passport');
-const { user } = require('pg/lib/defaults');
 const ValidationError = require('../errors/validationError');
-
 
 module.exports = (app) => {
   const findAll = (filter = {}) => {
@@ -13,7 +10,6 @@ module.exports = (app) => {
   };
 
   const findOne = (filter = {}) => {
-    let test =  isNaN(Number(filter.game_id));
     if(typeof(filter) !== 'object'  )  throw new ValidationError('O jogo indicado não é válido');
     if(filter.game_id) {
       if( isNaN(Number(filter.game_id))) throw new ValidationError('O jogo indicado não é válido');
