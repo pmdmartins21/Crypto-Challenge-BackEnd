@@ -6,7 +6,11 @@ module.exports = (app) => {
     return app.db('users').where(filter).select(['id', 'firstName', 'lastName','email', 'username' ]);
   };
 
-  const findOne = (filter = {}) => { //testar
+  const findOne = (filter = {}) => { 
+    return app.db('users').where(filter).first(['id', 'firstName', 'lastName','email', 'username' ]);
+  };
+
+  const findOneAuth = (filter = {}) => { 
     return app.db('users').where(filter).first();
   };
 
@@ -45,8 +49,8 @@ module.exports = (app) => {
   const update = (id, user) => {
     return app.db('users')
       .where({ id })
-      .update(user, '*');
+      .update(user, ['id', 'firstName', 'lastName','email', 'username' ]);
   };
 
-  return { findAll, save, findOne, remove, update };
+  return { findAll, save, findOne, findOneAuth, remove, update };
 };
