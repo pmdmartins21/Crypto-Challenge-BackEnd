@@ -11,7 +11,7 @@ module.exports = (app) => {
   const router = express.Router();
 
   router.post('/signin', (req, res, next) => {
-    app.services.user.findOne({ username: req.body.username })
+    app.services.user.findOneAuth({ username: req.body.username })
       .then((user) => {
         if (!user) throw new ValidationError('Autenticação Inválida! #2');
         if (bcrypt.compareSync(req.body.password, user.password)) {
